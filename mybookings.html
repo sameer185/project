@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelGo | My Bookings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="animations.css">
+<link rel="stylesheet" href="common.css">
+<style>
+/* Booking-page specific colours */
+:root{--green:#16a34a;--green-light:#f0fdf4;--orange:#ea580c;--orange-light:#fff7ed;--purple:#7c3aed;--purple-light:#f5f3ff;}
+
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px;}
+.summary-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:22px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);transition:all 0.25s;}
+.summary-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+.sum-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.sum-icon.flight{background:var(--accent-light);} .sum-icon.train{background:var(--orange-light);}
+.sum-icon.hotel{background:var(--green-light);}   .sum-icon.movie{background:#fdf4ff;}  .sum-icon.total{background:var(--purple-light);}
+.sum-label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.sum-value{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text);}
+
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+.filter-btn{padding:8px 18px;border:1.5px solid var(--border);background:var(--surface);border-radius:100px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px var(--accent-glow);}
+.filter-spacer{flex:1;}
+.clear-btn{padding:8px 18px;border:1.5px solid #fecaca;background:#fff5f5;border-radius:100px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:#dc2626;cursor:pointer;transition:all 0.2s;}
+.clear-btn:hover{background:#fef2f2;border-color:#dc2626;}
+
+.bookings-list{display:flex;flex-direction:column;gap:16px;}
+.booking-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow-sm);transition:all 0.25s;animation:slideUp 0.4s ease both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.booking-card:hover{box-shadow:var(--shadow);border-color:rgba(29,78,216,0.15);}
+
+.booking-header{display:flex;align-items:center;gap:14px;padding:18px 24px 16px;border-bottom:1px solid var(--border);}
+.bh-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.bh-icon.flight{background:var(--accent-light);} .bh-icon.train{background:var(--orange-light);} .bh-icon.hotel{background:var(--green-light);} .bh-icon.movie{background:#fdf4ff;}
+.bh-type{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:2px;}
+.bh-name{font-size:16px;font-weight:700;color:var(--text);}
+.bh-spacer{flex:1;}
+.status-badge{padding:5px 12px;border-radius:100px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.status-badge.confirmed{background:var(--green-light);color:var(--green);border:1px solid #bbf7d0;}
+.bh-price{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--accent);margin-left:16px;}
+
+.booking-body{padding:20px 24px;display:flex;flex-wrap:wrap;gap:24px;}
+.bd-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.bd-value{font-size:14px;font-weight:600;color:var(--text2);}
+.bd-value.highlight{color:var(--accent);}
+
+.booking-footer{display:flex;align-items:center;gap:12px;padding:14px 24px;background:var(--bg);border-top:1px solid var(--border);}
+.bf-date{font-size:12px;color:var(--muted);flex:1;}
+.btn-cancel{padding:7px 16px;border:1.5px solid #fecaca;background:#fff5f5;color:#dc2626;border-radius:8px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-cancel:hover{background:#fef2f2;}
+.btn-download{padding:7px 16px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);border-radius:8px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-download:hover{border-color:var(--accent);color:var(--accent);}
+
+.empty-state{text-align:center;padding:80px 20px;}
+.empty-icon{font-size:64px;margin-bottom:20px;}
+.empty-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:800;color:var(--text);margin-bottom:10px;}
+.empty-sub{color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:32px;}
+.empty-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn-primary{padding:13px 28px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;
+  box-shadow:0 6px 20px var(--accent-glow);text-decoration:none;display:inline-block;}
+.btn-outline-em{padding:13px 28px;background:transparent;color:var(--text2);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:500;
+  cursor:pointer;text-decoration:none;display:inline-block;transition:all 0.2s;}
+.btn-outline-em:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+
+@media(max-width:900px){.summary-row{grid-template-columns:repeat(3,1fr)!important;}}
+@media(max-width:600px){.summary-row{grid-template-columns:repeat(2,1fr)!important;}}
+@media(max-width:520px){.booking-header{flex-wrap:wrap;gap:10px;}.bh-price{margin-left:0;}}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">TravelGo</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="flight.html">Flights</a>
+    <a href="train.html">Trains</a>
+    <a href="hotel.html">Hotels</a>
+    <a href="movie.html">Movies</a>
+    <a href="mybookings.html" class="active">My Bookings</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="nav-cta">Sign Up Free</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="breadcrumb"><a href="index.html">Home</a> &rsaquo; My Bookings</div>
+  <h1>🗂️ My Bookings</h1>
+  <p>All your flight, train, hotel and movie reservations in one place.</p>
+</div>
+
+<div style="max-width:1100px;margin:0 auto;padding:40px 5% 80px;">
+  <div class="summary-row" style="grid-template-columns:repeat(5,1fr);">
+    <div class="summary-card"><div class="sum-icon flight">✈️</div><div><div class="sum-label">Flights</div><div class="sum-value" id="countFlight">0</div></div></div>
+    <div class="summary-card"><div class="sum-icon train">🚆</div><div><div class="sum-label">Trains</div><div class="sum-value" id="countTrain">0</div></div></div>
+    <div class="summary-card"><div class="sum-icon hotel">🏨</div><div><div class="sum-label">Hotels</div><div class="sum-value" id="countHotel">0</div></div></div>
+    <div class="summary-card"><div class="sum-icon movie">🎬</div><div><div class="sum-label">Movies</div><div class="sum-value" id="countMovie">0</div></div></div>
+    <div class="summary-card"><div class="sum-icon total">💰</div><div><div class="sum-label">Total Spent</div><div class="sum-value" id="totalSpent">₹0</div></div></div>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="applyFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="applyFilter('flight',this)">✈️ Flights</button>
+    <button class="filter-btn" onclick="applyFilter('train',this)">🚆 Trains</button>
+    <button class="filter-btn" onclick="applyFilter('hotel',this)">🏨 Hotels</button>
+    <button class="filter-btn" onclick="applyFilter('movie',this)">🎬 Movies</button>
+    <div class="filter-spacer"></div>
+    <button class="clear-btn" onclick="clearAllBookings()">🗑️ Clear All</button>
+  </div>
+
+  <div class="bookings-list" id="bookingsList"></div>
+</div>
+
+<footer style="background:#0d1117;color:#64748b;padding:32px 5%;text-align:center;font-size:13px;">
+  <span style="color:rgba(255,255,255,0.35);">© 2026 TravelGo. All rights reserved.</span>
+</footer>
+
+<script>
+let allBookings=[], currentFilter='all';
+
+function loadBookings(){try{allBookings=JSON.parse(localStorage.getItem('travelgo_bookings')||'[]');}catch{allBookings=[];}}
+function saveBookings(){localStorage.setItem('travelgo_bookings',JSON.stringify(allBookings));}
+
+function updateSummary(){
+  document.getElementById('countFlight').textContent=allBookings.filter(b=>b.type==='flight').length;
+  document.getElementById('countTrain').textContent=allBookings.filter(b=>b.type==='train').length;
+  document.getElementById('countHotel').textContent=allBookings.filter(b=>b.type==='hotel').length;
+  document.getElementById('countMovie').textContent=allBookings.filter(b=>b.type==='movie').length;
+  document.getElementById('totalSpent').textContent='₹'+allBookings.reduce((s,b)=>s+(b.priceNum||0),0).toLocaleString('en-IN');
+}
+
+function renderBookings(){
+  const list=document.getElementById('bookingsList');
+  const filtered=currentFilter==='all'?allBookings:allBookings.filter(b=>b.type===currentFilter);
+  if(!filtered.length){
+    const icons={flight:'✈️',train:'🚆',hotel:'🏨',movie:'🎬'};
+    list.innerHTML=`<div class="empty-state">
+      <div class="empty-icon">${icons[currentFilter]||'🗂️'}</div>
+      <div class="empty-title">No bookings yet</div>
+      <div class="empty-sub">${currentFilter==='all'?"You haven't made any bookings yet.<br>Start by searching for flights, trains, hotels or movies!":`No ${currentFilter} bookings found.`}</div>
+      <div class="empty-btns">
+        <a href="flight.html" class="btn-primary">✈️ Book a Flight</a>
+        <a href="train.html" class="btn-outline-em">🚆 Find a Train</a>
+        <a href="hotel.html" class="btn-outline-em">🏨 Book Hotel</a>
+        <a href="movie.html" class="btn-outline-em">🎬 Book Movies</a>
+      </div></div>`;
+    return;
+  }
+  list.innerHTML=filtered.slice().reverse().map((b,ri)=>{
+    const origIdx=allBookings.indexOf(b);
+    const icon=b.type==='flight'?'✈️':b.type==='train'?'🚆':b.type==='movie'?'🎬':'🏨';
+    const label=b.type==='flight'?'Flight':b.type==='train'?'Train':b.type==='movie'?'Movie':'Hotel';
+    const bookedOn=new Date(b.paidAt||b.bookedAt||Date.now()).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    let details='';
+    if(b.type==='flight') details=`
+      <div class="bd-item"><div class="bd-label">Airline</div><div class="bd-value">${b.airline||'—'}</div></div>
+      <div class="bd-item"><div class="bd-label">Route</div><div class="bd-value highlight">${b.route||'—'}</div></div>
+      ${b.departure?`<div class="bd-item"><div class="bd-label">Departure</div><div class="bd-value">${b.departure}</div></div>`:''}
+      ${b.arrival?`<div class="bd-item"><div class="bd-label">Arrival</div><div class="bd-value">${b.arrival}</div></div>`:''}
+      ${b.duration?`<div class="bd-item"><div class="bd-label">Duration</div><div class="bd-value">${b.duration}</div></div>`:''}`;
+    else if(b.type==='train') details=`
+      <div class="bd-item"><div class="bd-label">Train</div><div class="bd-value">${b.trainName||'—'}</div></div>
+      <div class="bd-item"><div class="bd-label">Route</div><div class="bd-value highlight">${b.route||'—'}</div></div>
+      ${b.travelClass?`<div class="bd-item"><div class="bd-label">Class</div><div class="bd-value">${b.travelClass}</div></div>`:''}
+      ${b.date?`<div class="bd-item"><div class="bd-label">Date</div><div class="bd-value">${b.date}</div></div>`:''}`;
+    else if(b.type==='movie') details=`
+      <div class="bd-item"><div class="bd-label">Movie</div><div class="bd-value">${b.movie||b.title||'—'}</div></div>
+      <div class="bd-item"><div class="bd-label">Showtime</div><div class="bd-value highlight">${b.showtime||'—'}</div></div>
+      ${b.seats?`<div class="bd-item"><div class="bd-label">Seats</div><div class="bd-value">${b.seats}</div></div>`:''}
+      ${b.addon&&b.addon!=='Standard'?`<div class="bd-item"><div class="bd-label">Experience</div><div class="bd-value">${b.addon}</div></div>`:''}`;
+    else details=`
+      <div class="bd-item"><div class="bd-label">Hotel</div><div class="bd-value">${b.hotelName||'—'}</div></div>
+      <div class="bd-item"><div class="bd-label">Location</div><div class="bd-value highlight">${b.location||'—'}</div></div>
+      ${b.stayType?`<div class="bd-item"><div class="bd-label">Stay Type</div><div class="bd-value">${b.stayType}</div></div>`:''}
+      ${b.nights?`<div class="bd-item"><div class="bd-label">Duration</div><div class="bd-value">${b.nights}</div></div>`:''}`;
+    return `<div class="booking-card" style="animation-delay:${ri*0.06}s">
+      <div class="booking-header">
+        <div class="bh-icon ${b.type}">${icon}</div>
+        <div><div class="bh-type">${label} Booking</div><div class="bh-name">${b.title||b.hotelName||b.trainName||b.airline||'Booking'}</div></div>
+        <div class="bh-spacer"></div>
+        <span class="status-badge confirmed">✅ Confirmed</span>
+        <div class="bh-price">${b.price||'—'}</div>
+      </div>
+      <div class="booking-body">${details}</div>
+      <div class="booking-footer">
+        <div class="bf-date">📅 Booked on ${bookedOn}</div>
+        <button class="btn-download" onclick="downloadTicket(${origIdx})">⬇️ Ticket</button>
+        <button class="btn-cancel" onclick="cancelBooking(${origIdx})">Cancel</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function applyFilter(type,btn){
+  currentFilter=type;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBookings();
+}
+
+function cancelBooking(idx){
+  const b=allBookings[idx];
+  if(!b||!confirm(`Cancel this ${b.type} booking?\n\n${b.title||b.hotelName||b.airline}\n${b.price}\n\nThis cannot be undone.`)) return;
+  allBookings.splice(idx,1);
+  saveBookings(); updateSummary(); renderBookings();
+  alert('✅ Booking cancelled successfully.');
+}
+
+function clearAllBookings(){
+  if(!allBookings.length){alert('No bookings to clear.');return;}
+  if(!confirm(`Clear ALL ${allBookings.length} booking(s)? This cannot be undone.`)) return;
+  allBookings=[];
+  saveBookings(); updateSummary(); renderBookings();
+}
+
+function downloadTicket(idx){
+  const b=allBookings[idx]; if(!b) return;
+  const icon=b.type==='flight'?'✈️':b.type==='train'?'🚆':'🏨';
+  const ref='TGO'+Math.random().toString(36).substring(2,8).toUpperCase();
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>TravelGo Ticket</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>body{font-family:'Plus Jakarta Sans',sans-serif;background:#f6f7fb;display:flex;justify-content:center;padding:40px 20px;}
+  .ticket{background:#fff;border-radius:20px;padding:40px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.1);}
+  .t-logo{font-size:22px;font-weight:900;color:#1d4ed8;margin-bottom:24px;}
+  .t-icon{font-size:48px;margin-bottom:12px;} .t-type{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+  .t-name{font-size:22px;font-weight:700;color:#0d1117;margin:8px 0 24px;}
+  .t-row{display:flex;justify-content:space-between;border-top:1px dashed #e2e8f0;padding:12px 0;}
+  .t-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+  .t-val{font-size:14px;font-weight:600;color:#2d3748;}
+  .t-price{font-size:28px;font-weight:800;color:#1d4ed8;margin:20px 0 8px;}
+  .t-status{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700;display:inline-block;}
+  .t-ref{font-size:12px;color:#64748b;margin-top:8px;}
+  .print-btn{margin-top:24px;width:100%;padding:12px;background:#1d4ed8;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;}
+  </style></head><body><div class="ticket">
+  <div class="t-logo">TravelGo</div><div class="t-icon">${icon}</div>
+  <div class="t-type">${b.type} Booking</div><div class="t-name">${b.title||b.hotelName||b.trainName||b.airline}</div>
+  ${b.route?`<div class="t-row"><div><div class="t-label">Route</div><div class="t-val">${b.route}</div></div></div>`:''}
+  ${b.hotelName?`<div class="t-row"><div><div class="t-label">Hotel</div><div class="t-val">${b.hotelName}</div></div></div>`:''}
+  ${b.location?`<div class="t-row"><div><div class="t-label">Location</div><div class="t-val">${b.location}</div></div></div>`:''}
+  ${b.nights?`<div class="t-row"><div><div class="t-label">Duration</div><div class="t-val">${b.nights}</div></div></div>`:''}
+  ${b.movie?`<div class="t-row"><div><div class="t-label">Movie</div><div class="t-val">${b.movie}</div></div></div>`:''}
+  ${b.showtime?`<div class="t-row"><div><div class="t-label">Showtime</div><div class="t-val">${b.showtime}</div></div></div>`:''}
+  ${b.seats?`<div class="t-row"><div><div class="t-label">Seats</div><div class="t-val">${b.seats}</div></div></div>`:''}
+  ${b.addon&&b.addon!=='Standard'?`<div class="t-row"><div><div class="t-label">Experience</div><div class="t-val">${b.addon}</div></div></div>`:''}
+  <div class="t-row"><div><div class="t-label">Booked On</div><div class="t-val">${new Date(b.paidAt||b.bookedAt||Date.now()).toLocaleString('en-IN')}</div></div></div>
+  <div class="t-price">${b.price}</div><div class="t-status">✅ Confirmed</div><div class="t-ref">Ref: ${ref}</div>
+  <button class="print-btn" onclick="window.print()">🖨️ Print Ticket</button>
+  </div></body></html>`);
+  win.document.close();
+}
+
+loadBookings(); updateSummary(); renderBookings();
+</script>
+<script src="navbar.js"></script>
+<script src="animations.js"></script>
+</body>
+</html>

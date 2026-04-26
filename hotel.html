@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelGo | Hotel Booking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="animations.css">
+<link rel="stylesheet" href="common.css">
+<script src="stateCity.js"></script>
+<style>
+/* Hotel page hero tint */
+.page-hero{background:linear-gradient(135deg,#fef9ee 0%,var(--bg) 65%);}
+
+.stay-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.stay-tab{padding:8px 18px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;
+  color:var(--muted);font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.stay-tab.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:700;}
+.micro-tag{background:#fef3c7;border:1px solid #fcd34d;color:#92400e;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:4px;margin-left:5px;text-transform:uppercase;}
+
+.micro-selector{background:linear-gradient(135deg,#fef9c3,#fef3c7);border:1.5px solid #fcd34d;
+  border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:16px;display:none;}
+.micro-selector h4{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#92400e;margin-bottom:12px;}
+.micro-options{display:flex;gap:10px;flex-wrap:wrap;}
+.micro-opt{padding:10px 20px;background:#fff;border:1.5px solid #fcd34d;border-radius:8px;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#92400e;transition:all 0.2s;}
+.micro-opt.active,.micro-opt:hover{background:#d97706;color:#fff;border-color:#d97706;}
+
+.star-filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.star-btn{padding:7px 14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;
+  color:var(--muted);font-size:13px;cursor:pointer;transition:all 0.2s;}
+.star-btn.active{background:#fefce8;border-color:var(--gold);color:#92400e;font-weight:700;}
+
+.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+.hotels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;}
+.hotel-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 2px 12px rgba(0,0,0,0.05);transition:all 0.3s;}
+.hotel-card:hover{transform:translateY(-6px);border-color:rgba(29,78,216,0.3);box-shadow:0 16px 48px rgba(29,78,216,0.1);}
+.hotel-img-wrap{position:relative;height:200px;overflow:hidden;background:linear-gradient(135deg,var(--accent-light),#e0f2fe);}
+.hotel-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
+.hotel-card:hover .hotel-img-wrap img{transform:scale(1.04);}
+.vr-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);
+  color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;}
+.vr-btn:hover{background:rgba(29,78,216,0.85);}
+.micro-badge{position:absolute;top:10px;left:10px;background:#d97706;color:#fff;font-size:10px;
+  font-weight:700;padding:4px 11px;border-radius:100px;display:none;}
+.hotel-body{padding:20px;}
+.hotel-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:3px;}
+.hotel-loc{font-size:12px;color:var(--muted);margin-bottom:7px;font-weight:500;}
+.hotel-stars{font-size:14px;margin-bottom:10px;}
+.hotel-amenities{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;}
+.amen{background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;}
+.hotel-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.hotel-price .amount{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--accent);}
+.hotel-price .night{font-size:11px;color:var(--muted);}
+.btn-group{display:flex;gap:8px;}
+.book-btn{padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:8px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 14px var(--accent-glow);}
+.vr-book-btn{padding:9px 14px;background:var(--accent-light);color:var(--accent);border:1.5px solid var(--accent);
+  border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.vr-book-btn:hover{background:var(--accent);color:#fff;}
+
+/* VR Modal */
+.vr-modal{background:#0f172a;border-radius:var(--radius-lg);max-width:820px;width:96%;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.5);}
+.vr-header{padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vr-header h3{font-family:'Playfair Display',serif;color:#fff;font-size:18px;font-weight:700;}
+.vr-close{background:rgba(255,255,255,0.1);border:none;color:#fff;width:34px;height:34px;
+  border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.vr-viewport{height:480px;display:flex;align-items:stretch;justify-content:center;overflow:hidden;background:#000;position:relative;}
+.vr-viewport img{width:100%;height:100%;object-fit:cover;display:block;}
+.vr-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.5);color:#fff;font-size:14px;pointer-events:none;}
+.vr-placeholder{color:#fff;text-align:center;padding:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;}
+.vr-placeholder h4{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;margin-bottom:8px;}
+.vr-placeholder p{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;}
+.vr-controls{padding:14px 20px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.08);background:#0d1526;}
+.vr-ctrl-btn{padding:8px 16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  color:#fff;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.vr-ctrl-btn:hover,.vr-ctrl-btn.active{background:var(--accent);border-color:var(--accent);}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">TravelGo</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="flight.html">Flights</a>
+    <a href="train.html">Trains</a>
+    <a href="hotel.html" class="active">Hotels</a>
+    <a href="movie.html">Movies</a>
+    <a href="mybookings.html">My Bookings</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="nav-cta">Sign Up</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="breadcrumb"><a href="index.html">Home</a> → Hotels</div>
+  <h1>🏨 Hotel Booking</h1>
+  <p>Try before you book — with 360° VR room previews and hourly micro-stays.</p>
+  <div class="feature-badges">
+    <div class="fbadge new">🥽 360° VR Room Preview</div>
+    <div class="fbadge new">⏱️ Hourly Micro-Stays</div>
+    <div class="fbadge">⭐ Best Price Guarantee</div>
+  </div>
+</div>
+
+<div class="booking-section" style="padding-top:28px;">
+  <div class="form-card">
+    <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px;">Stay Type</div>
+    <div class="stay-tabs">
+      <button class="stay-tab active" onclick="setStay(this,'full')">🌙 Full Night Stay</button>
+      <button class="stay-tab" onclick="setStay(this,'micro')">⚡ Micro-Stay <span class="micro-tag">NEW</span></button>
+    </div>
+
+    <div class="micro-selector" id="microSelector">
+      <h4>⏱️ Select Micro-Stay Duration</h4>
+      <div class="micro-options">
+        <div class="micro-opt" onclick="selectMicro(this,'3')">3 Hours</div>
+        <div class="micro-opt active" onclick="selectMicro(this,'6')">6 Hours</div>
+        <div class="micro-opt" onclick="selectMicro(this,'12')">12 Hours</div>
+      </div>
+    </div>
+
+    <div class="form-row three">
+      <div class="field"><label>State</label><select id="hState"></select></div>
+      <div class="field"><label>City</label><select id="hCity" disabled></select></div>
+      <div class="field"><label>Hotel Name (optional)</label><input type="text" placeholder="Search specific hotel"></div>
+    </div>
+    <div class="form-row four" id="fullDateRow">
+      <div class="field"><label>Check-in</label><input type="date" id="checkIn"></div>
+      <div class="field"><label>Check-out</label><input type="date" id="checkOut"></div>
+      <div class="field"><label>Rooms</label><select><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+      <div class="field"><label>Guests</label><select><option>1 Guest</option><option>2 Guests</option><option>3 Guests</option><option>4 Guests</option></select></div>
+    </div>
+    <div class="form-row" id="microDateRow" style="display:none;">
+      <div class="field"><label>Date</label><input type="date" id="microDate"></div>
+      <div class="field"><label>Check-in Time</label><input type="time" id="microTime" value="10:00"></div>
+    </div>
+    <div class="field" style="margin-bottom:0;margin-top:4px;">
+      <label>Star Rating</label>
+      <div class="star-filters">
+        <button class="star-btn" onclick="this.classList.toggle('active')">⭐ 1 Star</button>
+        <button class="star-btn" onclick="this.classList.toggle('active')">⭐⭐ 2 Star</button>
+        <button class="star-btn active" onclick="this.classList.toggle('active')">⭐⭐⭐ 3 Star</button>
+        <button class="star-btn" onclick="this.classList.toggle('active')">⭐⭐⭐⭐ 4 Star</button>
+        <button class="star-btn" onclick="this.classList.toggle('active')">⭐⭐⭐⭐⭐ 5 Star</button>
+      </div>
+    </div>
+    <button class="search-btn" onclick="searchHotels()">Search Hotels →</button>
+  </div>
+</div>
+
+<div class="results-section" id="resultsSection">
+  <div class="results-header"><div class="results-title" id="resultsTitle">Available Hotels</div></div>
+  <div class="hotels-grid" id="hotelCards"></div>
+</div>
+
+<!-- VR MODAL -->
+<div class="modal-overlay" id="vrModal">
+  <div class="vr-modal">
+    <div class="vr-header">
+      <h3 id="vrHotelName">🥽 360° VR Room Tour</h3>
+      <button class="vr-close" onclick="closeVR()">✕</button>
+    </div>
+    <div class="vr-viewport" id="vrViewport">
+      <div class="vr-placeholder"><h4>Select a View Below</h4><p>Click Bedroom, Bathroom, Balcony or Pool to explore.</p></div>
+    </div>
+    <div class="vr-controls">
+      <button class="vr-ctrl-btn active" onclick="switchVR(this)">🛏️ Bedroom</button>
+      <button class="vr-ctrl-btn" onclick="switchVR(this)">🚿 Bathroom</button>
+      <button class="vr-ctrl-btn" onclick="switchVR(this)">🌅 Balcony View</button>
+      <button class="vr-ctrl-btn" onclick="switchVR(this)">🏊 Pool Area</button>
+      <button class="vr-ctrl-btn" style="margin-left:auto;background:var(--accent);border-color:var(--accent);" onclick="closeVR()">Book This Room →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('checkIn').min=today; document.getElementById('checkIn').value=today;
+document.getElementById('microDate').min=today; document.getElementById('microDate').value=today;
+const tom=new Date(); tom.setDate(tom.getDate()+1);
+const tomStr=tom.toISOString().split('T')[0];
+document.getElementById('checkOut').min=tomStr; document.getElementById('checkOut').value=tomStr;
+
+let stayType='full', microHours=6, currentVrHotel=null;
+wireStateCity('hState','hCity','Select City');
+
+function setStay(el,type){
+  document.querySelectorAll('.stay-tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); stayType=type;
+  document.getElementById('microSelector').style.display=type==='micro'?'block':'none';
+  document.getElementById('fullDateRow').style.display=type==='full'?'grid':'none';
+  document.getElementById('microDateRow').style.display=type==='micro'?'grid':'none';
+}
+function selectMicro(el,h){
+  document.querySelectorAll('.micro-opt').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); microHours=parseInt(h);
+}
+
+const STATE_HOTELS={
+  'Tamil Nadu':[
+    {name:'The Leela Palace Chennai',img:'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=800&q=80',loc:'Adyar, Chennai',stars:'⭐⭐⭐⭐⭐',price:12500,microPrice:{3:2800,6:5200,12:9000},amenities:['Pool','Spa','WiFi','Restaurant','Gym','Valet'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+    {name:'Taj Coromandel',img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80',loc:'Nungambakkam, Chennai',stars:'⭐⭐⭐⭐⭐',price:9800,microPrice:{3:2200,6:4000,12:7000},amenities:['Pool','WiFi','Restaurant','Bar','Spa'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80',balcony:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80',pool:'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80'}},
+    {name:'Hyatt Regency Chennai',img:'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80',loc:'Anna Salai, Chennai',stars:'⭐⭐⭐⭐',price:6800,microPrice:{3:1500,6:2800,12:4800},amenities:['Pool','WiFi','Gym','Restaurant'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1601565415267-724db0e1d8f0?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80',pool:'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=800&q=80'}},
+    {name:'Radisson Blu Chennai',img:'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80',loc:'T. Nagar, Chennai',stars:'⭐⭐⭐⭐',price:5200,microPrice:{3:1100,6:2000,12:3600},amenities:['WiFi','Restaurant','Bar','Gym'],vr:false,vrImgs:{}},
+    {name:'Mahabalipuram Beach Resort',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',loc:'Mahabalipuram, TN',stars:'⭐⭐⭐',price:3500,microPrice:{3:780,6:1400,12:2500},amenities:['Beach','Pool','WiFi','Restaurant'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1595576508898-0ad5c879a061?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1439130490301-25e322d88054?w=800&q=80',pool:'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80'}},
+    {name:'Sterling Ooty',img:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',loc:'Ooty, Tamil Nadu',stars:'⭐⭐⭐',price:4200,microPrice:{3:950,6:1700,12:3000},amenities:['WiFi','Restaurant','Garden','Bonfire'],vr:false,vrImgs:{}},
+  ],
+  'Maharashtra':[
+    {name:'Taj Mahal Palace Mumbai',img:'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800&q=80',loc:'Colaba, Mumbai',stars:'⭐⭐⭐⭐⭐',price:18000,microPrice:{3:4000,6:7500,12:13000},amenities:['Pool','Spa','WiFi','5 Restaurants','Butler'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+    {name:'The Westin Pune',img:'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800&q=80',loc:'Koregaon Park, Pune',stars:'⭐⭐⭐⭐',price:7200,microPrice:{3:1600,6:3000,12:5200},amenities:['Pool','Spa','WiFi','Restaurant','Gym'],vr:false,vrImgs:{}},
+  ],
+  'Rajasthan':[
+    {name:'Umaid Bhawan Palace Jodhpur',img:'https://images.unsplash.com/photo-1598300188270-0b1438698494?w=800&q=80',loc:'Jodhpur, Rajasthan',stars:'⭐⭐⭐⭐⭐',price:35000,microPrice:{3:8000,6:15000,12:26000},amenities:['Heritage','Pool','Spa','WiFi','Fine Dining'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+    {name:'Taj Lake Palace Udaipur',img:'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',loc:'Lake Pichola, Udaipur',stars:'⭐⭐⭐⭐⭐',price:28000,microPrice:{3:6500,6:12000,12:20000},amenities:['Lake View','Spa','WiFi','Restaurant','Butler'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80',balcony:'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80',pool:'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80'}},
+  ],
+  'Goa':[
+    {name:'Taj Exotica Resort & Spa',img:'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80',loc:'Benaulim Beach, South Goa',stars:'⭐⭐⭐⭐⭐',price:16000,microPrice:{3:3600,6:6800,12:11500},amenities:['Beach','Pool','Spa','WiFi','Water Sports'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+    {name:'The Leela Goa',img:'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=800&q=80',loc:'Mobor Beach, South Goa',stars:'⭐⭐⭐⭐⭐',price:14500,microPrice:{3:3200,6:6000,12:10500},amenities:['Beach','Pool','Spa','WiFi','Golf'],vr:false,vrImgs:{}},
+  ],
+  'Kerala':[
+    {name:'Kumarakom Lake Resort',img:'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=800&q=80',loc:'Kumarakom, Kerala',stars:'⭐⭐⭐⭐⭐',price:14000,microPrice:{3:3100,6:5800,12:10000},amenities:['Backwaters','Pool','Spa','Ayurveda','WiFi'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1439130490301-25e322d88054?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+    {name:'Houseboat Alleppey',img:'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80',loc:'Alleppey Backwaters',stars:'⭐⭐⭐',price:8500,microPrice:{3:1900,6:3500,12:6000},amenities:['Backwater Cruise','AC','Chef','WiFi'],vr:false,vrImgs:{}},
+  ],
+  'Karnataka':[
+    {name:'The Ritz-Carlton Bangalore',img:'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800&q=80',loc:'Residency Road, Bengaluru',stars:'⭐⭐⭐⭐⭐',price:16000,microPrice:{3:3600,6:6800,12:11500},amenities:['Pool','Spa','WiFi','Restaurant','Gym'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+    {name:'Evolve Back Coorg',img:'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&q=80',loc:'Madikeri, Coorg',stars:'⭐⭐⭐⭐⭐',price:19000,microPrice:{3:4200,6:8000,12:14000},amenities:['Forest Pool','Spa','WiFi','Coffee Estate Tour'],vr:false,vrImgs:{}},
+  ],
+  'Telangana':[
+    {name:'Taj Falaknuma Palace',img:'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',loc:'Engine Bowli, Hyderabad',stars:'⭐⭐⭐⭐⭐',price:25000,microPrice:{3:5500,6:10500,12:18000},amenities:['Heritage Palace','Pool','Spa','WiFi','Dining'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+    {name:'Novotel Hyderabad',img:'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80',loc:'Hitech City, Hyderabad',stars:'⭐⭐⭐⭐',price:6200,microPrice:{3:1400,6:2600,12:4500},amenities:['Pool','WiFi','Restaurant','Gym'],vr:false,vrImgs:{}},
+  ],
+  'Delhi':[
+    {name:'The Imperial New Delhi',img:'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&q=80',loc:'Janpath, New Delhi',stars:'⭐⭐⭐⭐⭐',price:22000,microPrice:{3:5000,6:9500,12:16000},amenities:['Heritage','Pool','Spa','WiFi','Fine Dining'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+    {name:'Hyatt Regency Delhi',img:'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=80',loc:'Bhikaiji Cama Place, Delhi',stars:'⭐⭐⭐⭐',price:8500,microPrice:{3:1900,6:3500,12:6000},amenities:['Pool','WiFi','Restaurant','Gym'],vr:false,vrImgs:{}},
+  ],
+  'West Bengal':[
+    {name:'Taj Bengal Kolkata',img:'https://images.unsplash.com/photo-1545579133-99bb5ab189bd?w=800&q=80',loc:'Alipore, Kolkata',stars:'⭐⭐⭐⭐⭐',price:11000,microPrice:{3:2500,6:4600,12:8000},amenities:['Pool','Spa','WiFi','Restaurant'],vr:false,vrImgs:{}},
+  ],
+};
+const DEFAULT_HOTELS=[
+  {name:'Taj Hotel & Convention Centre',img:'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80',loc:'City Centre',stars:'⭐⭐⭐⭐⭐',price:12000,microPrice:{3:2700,6:5000,12:8600},amenities:['Pool','Spa','WiFi','Restaurant','Gym'],vr:true,vrImgs:{bedroom:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',bathroom:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',balcony:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80',pool:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'}},
+  {name:'Marriott Hotel',img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80',loc:'Business District',stars:'⭐⭐⭐⭐',price:7500,microPrice:{3:1700,6:3100,12:5400},amenities:['Pool','WiFi','Restaurant','Gym'],vr:false,vrImgs:{}},
+  {name:'Lemon Tree Premier',img:'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800&q=80',loc:'Airport Road',stars:'⭐⭐⭐⭐',price:4800,microPrice:{3:1100,6:2000,12:3500},amenities:['WiFi','Restaurant','Gym'],vr:false,vrImgs:{}},
+  {name:'OYO Townhouse',img:'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80',loc:'City Area',stars:'⭐⭐⭐',price:1800,microPrice:{3:400,6:750,12:1300},amenities:['WiFi','AC','Parking'],vr:false,vrImgs:{}},
+];
+
+function getHotels(state){return STATE_HOTELS[state]||DEFAULT_HOTELS;}
+
+function searchHotels(){
+  const state=document.getElementById('hState').value;
+  const city=document.getElementById('hCity').value;
+  if(!city){alert('Please select a state and city.');return;}
+  const isMicro=stayType==='micro';
+  let nightsLabel='';
+  if(isMicro){nightsLabel=`${microHours}-hour micro-stay`;}
+  else{
+    const ci=document.getElementById('checkIn').value, co=document.getElementById('checkOut').value;
+    if(!ci||!co){alert('Please select check-in and check-out dates.');return;}
+    if(new Date(co)<=new Date(ci)){alert('Check-out must be after check-in.');return;}
+    const n=Math.round((new Date(co)-new Date(ci))/(1000*3600*24));
+    nightsLabel=`${n} night${n>1?'s':''}`;
+  }
+  const hotels=getHotels(state);
+  document.getElementById('resultsTitle').textContent=`Hotels in ${city} — ${isMicro?microHours+'-Hour Micro-Stay':nightsLabel}`;
+  document.getElementById('hotelCards').innerHTML=hotels.map((h,i)=>{
+    const dp=isMicro?`₹${h.microPrice[microHours].toLocaleString('en-IN')}`:`₹${h.price.toLocaleString('en-IN')}`;
+    const pl=isMicro?`for ${microHours} hours`:'per night';
+    return `<div class="hotel-card card">
+      <div class="hotel-img-wrap">
+        <img src="${h.img}" alt="${h.name}" onerror="this.style.display='none'">
+        ${isMicro?`<div class="micro-badge" style="display:block;">⚡ ${microHours}h</div>`:''}
+        ${h.vr?`<button class="vr-btn" onclick="openVR(${i},'${h.name.replace(/'/g,"\\'")}')">🥽 VR Preview</button>`:''}
+      </div>
+      <div class="hotel-body">
+        <div class="hotel-name">${h.name}</div>
+        <div class="hotel-loc">📍 ${h.loc}</div>
+        <div class="hotel-stars">${h.stars}</div>
+        <div class="hotel-amenities">${h.amenities.map(a=>`<span class="amen">${a}</span>`).join('')}</div>
+        <div class="hotel-footer">
+          <div class="hotel-price"><div class="amount">${dp}</div><div class="night">${pl}</div></div>
+          <div class="btn-group">
+            ${h.vr?`<button class="vr-book-btn" onclick="openVR(${i},'${h.name.replace(/'/g,"\\'")}')">🥽 VR Tour</button>`:''}
+            <button class="book-btn" onclick="confirmHotel('${h.name.replace(/'/g,"\\'")}','${h.loc.replace(/'/g,"\\'")}','${dp}','${nightsLabel}')">Book Now →</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const sec=document.getElementById('resultsSection');
+  sec.style.display='block';
+  sec.scrollIntoView({behavior:'smooth'});
+}
+
+let _hotels=[];
+function openVR(idx,name){
+  const state=document.getElementById('hState').value;
+  _hotels=getHotels(state);
+  currentVrHotel=_hotels[idx];
+  document.getElementById('vrHotelName').textContent='🥽 '+name+' — VR Room Tour';
+  document.querySelectorAll('.vr-ctrl-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  setVRImage(currentVrHotel.vrImgs.bedroom||'');
+  document.getElementById('vrModal').classList.add('open');
+}
+function closeVR(){document.getElementById('vrModal').classList.remove('open');}
+function setVRImage(url){
+  document.getElementById('vrViewport').innerHTML=`
+    <div class="vr-loading">⏳ Loading...</div>
+    <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity 0.4s;"
+      onload="this.style.opacity=1;const l=this.parentElement.querySelector('.vr-loading');if(l)l.remove();"
+      onerror="this.parentElement.innerHTML='<div class=vr-placeholder><p style=color:rgba(255,255,255,0.6)>Image unavailable</p></div>'">`;
+}
+function switchVR(el){
+  document.querySelectorAll('.vr-ctrl-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  if(!currentVrHotel) return;
+  const map={'🛏️ Bedroom':'bedroom','🚿 Bathroom':'bathroom','🌅 Balcony View':'balcony','🏊 Pool Area':'pool'};
+  const key=map[el.textContent.trim()]||'bedroom';
+  setVRImage(currentVrHotel.vrImgs[key]||currentVrHotel.vrImgs.bedroom||'');
+}
+
+function confirmHotel(name,loc,price,nights){
+  const booking={
+    type:'hotel',
+    title:name,
+    detail:`📍 ${loc} · ${stayType==='micro'?`Micro-Stay (${microHours}h)`:'Full Night Stay'} · ${nights}`,
+    hotelName:name, location:loc, nights,
+    stayType:stayType==='micro'?`Micro-Stay (${microHours}h)`:'Full Night Stay',
+    price, priceNum:parseInt(price.replace(/[^0-9]/g,''))||0
+  };
+  localStorage.setItem('travelgo_pending_payment', JSON.stringify(booking));
+  window.location.href='payment.html';
+}
+</script>
+<script src="navbar.js"></script>
+<script src="animations.js"></script>
+</body>
+</html>

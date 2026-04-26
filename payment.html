@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelGo | Secure Payment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="animations.css">
+<link rel="stylesheet" href="common.css">
+<style>
+/* ── PAYMENT PAGE ── */
+.pay-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 32px;
+  padding: 36px 5% 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── ORDER SUMMARY (right panel) ── */
+.order-summary {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 86px;
+  height: fit-content;
+}
+.summary-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 22px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.summary-item:last-of-type { border-bottom: none; }
+.si-label { font-size: 13px; color: var(--muted); font-weight: 500; }
+.si-val { font-size: 13px; color: var(--text); font-weight: 700; text-align: right; }
+.summary-divider { height: 1px; background: var(--border); margin: 6px 0; }
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  margin-top: 4px;
+}
+.st-label { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; }
+.st-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent);
+}
+.secure-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 20px;
+  font-size: 12px;
+  color: #166534;
+  font-weight: 600;
+}
+.trust-logos {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  align-items: center;
+}
+.trust-logo {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+/* ── PAYMENT FORM (left panel) ── */
+.pay-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 38px;
+  box-shadow: var(--shadow);
+}
+.pay-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+/* ── PAYMENT METHOD TABS ── */
+.pay-methods {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.pay-method-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 8px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.22s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.pay-method-btn .pm-icon { font-size: 26px; }
+.pay-method-btn .pm-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.4px; }
+.pay-method-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.pay-method-btn.active .pm-label { color: var(--accent); }
+.pay-method-btn:hover:not(.active) { border-color: #a5b4fc; background: #f8f9ff; }
+
+/* ── METHOD PANELS ── */
+.method-panel { display: none; }
+.method-panel.active { display: block; }
+
+/* UPI */
+.upi-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+.upi-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.upi-opt.selected { border-color: var(--accent); background: var(--accent-light); }
+.upi-opt .upi-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+}
+.upi-opt .upi-name { font-size: 11px; font-weight: 700; color: var(--muted); }
+.upi-opt.selected .upi-name { color: var(--accent); }
+.upi-id-field { display: none; margin-top: 4px; }
+.upi-id-field.show { display: block; }
+.upi-qr-box {
+  background: var(--bg);
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  margin-top: 14px;
+  display: none;
+}
+.upi-qr-box.show { display: block; }
+.qr-img {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.qr-code-svg { width: 120px; height: 120px; }
+
+/* Card */
+.card-preview {
+  background: linear-gradient(135deg, #1d4ed8, #0891b2);
+  border-radius: 16px;
+  padding: 26px 28px;
+  color: #fff;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(29,78,216,0.28);
+  min-height: 180px;
+}
+.card-preview::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 50%;
+  top: -60px;
+  right: -50px;
+}
+.card-preview::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  bottom: -50px;
+  left: -40px;
+}
+.card-chip { font-size: 28px; margin-bottom: 22px; }
+.card-number-display {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  letter-spacing: 4px;
+  margin-bottom: 18px;
+  font-weight: 700;
+}
+.card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+.card-holder-label, .card-exp-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.65; margin-bottom: 3px; }
+.card-holder-val, .card-exp-val { font-size: 14px; font-weight: 700; }
+.card-brand { font-size: 32px; }
+
+.card-type-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.card-type-btn {
+  flex: 1;
+  padding: 9px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.card-type-btn.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+
+/* Net Banking */
+.bank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.bank-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 6px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bank-opt.selected { border-color: var(--accent); background: var(--accent-light); }
+.bank-logo { font-size: 24px; }
+.bank-name { font-size: 10px; font-weight: 700; color: var(--muted); text-align: center; }
+.bank-opt.selected .bank-name { color: var(--accent); }
+.other-bank-select {
+  padding: 11px 14px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* Wallet */
+.wallet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.wallet-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 10px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.wallet-opt.selected { border-color: var(--accent); background: var(--accent-light); }
+.wallet-logo { font-size: 28px; }
+.wallet-name { font-size: 11px; font-weight: 700; color: var(--muted); }
+.wallet-opt.selected .wallet-name { color: var(--accent); }
+
+/* ── SHARED FIELD OVERRIDES IN PAYMENT ── */
+.pay-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.pay-field label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.pay-field input, .pay-field select {
+  padding: 13px 15px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  transition: all 0.25s;
+  outline: none;
+}
+.pay-field input:focus {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(29,78,216,0.08);
+}
+.pay-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.pay-row-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; }
+
+/* ── PROMO CODE ── */
+.promo-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.promo-input {
+  flex: 1;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+.promo-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(217,119,6,0.09); }
+.promo-btn {
+  padding: 12px 20px;
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.promo-btn:hover { background: #b45309; }
+.promo-success {
+  display: none;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #166534;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* ── PAY NOW BUTTON ── */
+.pay-now-btn {
+  width: 100%;
+  padding: 17px;
+  background: linear-gradient(135deg, var(--accent), #0891b2);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  box-shadow: 0 8px 28px var(--accent-glow);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.pay-now-btn:hover { box-shadow: 0 14px 40px var(--accent-glow); transform: translateY(-1px); }
+.pay-now-btn:active { transform: translateY(0); }
+
+/* ── PROCESSING OVERLAY ── */
+#processingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+#processingOverlay.show { display: flex; }
+.processing-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 52px 48px;
+  text-align: center;
+  max-width: 380px;
+  width: 92%;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+}
+.processing-icon { font-size: 56px; margin-bottom: 14px; }
+.processing-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.processing-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--accent-light);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 20px auto 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── SUCCESS CARD ── */
+.success-screen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.success-screen.show { display: flex; }
+.success-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 56px 48px;
+  text-align: center;
+  max-width: 460px;
+  width: 92%;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.12);
+  border: 1.5px solid var(--border);
+}
+.success-tick {
+  width: 80px;
+  height: 80px;
+  background: #dcfce7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  margin: 0 auto 22px;
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.success-sub { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+.booking-ref {
+  background: var(--bg);
+  border: 1.5px dashed var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+}
+.ref-label { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+.ref-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; color: var(--accent); }
+.success-btns { display: flex; gap: 12px; }
+.success-btn-primary {
+  flex: 1;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.success-btn-secondary {
+  flex: 1;
+  padding: 13px;
+  background: #fff;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .pay-layout { grid-template-columns: 1fr; }
+  .order-summary { position: static; }
+}
+@media(max-width:600px){
+  .pay-methods { grid-template-columns: repeat(2,1fr); }
+  .upi-options { grid-template-columns: repeat(2,1fr); }
+  .bank-grid { grid-template-columns: repeat(2,1fr); }
+  .wallet-grid { grid-template-columns: repeat(2,1fr); }
+  .pay-row-3 { grid-template-columns: 1fr; }
+  .pay-card { padding: 22px 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">TravelGo</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="flight.html">Flights</a>
+    <a href="train.html">Trains</a>
+    <a href="hotel.html">Hotels</a>
+    <a href="movie.html">Movies</a>
+    <a href="mybookings.html">My Bookings</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="nav-cta">Sign Up</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="breadcrumb"><a href="index.html">Home</a> → <a id="breadcrumbBack" href="#">Booking</a> → Payment</div>
+  <h1>🔐 Secure Payment</h1>
+  <p>Your payment is encrypted with 256-bit SSL. We never store your card details.</p>
+  <div class="feature-badges">
+    <div class="fbadge new">🔒 256-bit SSL Encryption</div>
+    <div class="fbadge new">✅ PCI DSS Compliant</div>
+    <div class="fbadge">⚡ Instant Confirmation</div>
+    <div class="fbadge">💳 10+ Payment Methods</div>
+  </div>
+</div>
+
+<div class="pay-layout">
+  <!-- LEFT: Payment Form -->
+  <div>
+    <!-- Contact Details -->
+    <div class="pay-card" style="margin-bottom:20px;">
+      <div class="pay-section-title">👤 Contact Information</div>
+      <div class="pay-row">
+        <div class="pay-field">
+          <label>Full Name</label>
+          <input type="text" id="contactName" placeholder="As per ID proof" autocomplete="name">
+        </div>
+        <div class="pay-field">
+          <label>Email Address</label>
+          <input type="email" id="contactEmail" placeholder="ticket@email.com" autocomplete="email">
+        </div>
+      </div>
+      <div class="pay-field">
+        <label>Mobile Number</label>
+        <input type="tel" id="contactPhone" placeholder="+91 98765 43210" autocomplete="tel" maxlength="15">
+      </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="pay-card">
+      <div class="pay-section-title">💳 Choose Payment Method</div>
+
+      <div class="pay-methods">
+        <button class="pay-method-btn active" onclick="switchMethod('upi',this)">
+          <span class="pm-icon">📱</span>
+          <span class="pm-label">UPI</span>
+        </button>
+        <button class="pay-method-btn" onclick="switchMethod('card',this)">
+          <span class="pm-icon">💳</span>
+          <span class="pm-label">Card</span>
+        </button>
+        <button class="pay-method-btn" onclick="switchMethod('netbanking',this)">
+          <span class="pm-icon">🏦</span>
+          <span class="pm-label">Net Banking</span>
+        </button>
+        <button class="pay-method-btn" onclick="switchMethod('wallet',this)">
+          <span class="pm-icon">👝</span>
+          <span class="pm-label">Wallet</span>
+        </button>
+      </div>
+
+      <!-- UPI PANEL -->
+      <div class="method-panel active" id="panel-upi">
+        <div style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px;">Choose your UPI app</div>
+        <div class="upi-options">
+          <div class="upi-opt selected" onclick="selectUPI(this,'gpay')">
+            <div class="upi-logo" style="background:#e8f5e9;">💚</div>
+            <div class="upi-name">Google Pay</div>
+          </div>
+          <div class="upi-opt" onclick="selectUPI(this,'phonepe')">
+            <div class="upi-logo" style="background:#ede7f6;">💜</div>
+            <div class="upi-name">PhonePe</div>
+          </div>
+          <div class="upi-opt" onclick="selectUPI(this,'paytm')">
+            <div class="upi-logo" style="background:#e3f2fd;">💙</div>
+            <div class="upi-name">Paytm</div>
+          </div>
+          <div class="upi-opt" onclick="selectUPI(this,'bhim')">
+            <div class="upi-logo" style="background:#fff3e0;">🟠</div>
+            <div class="upi-name">BHIM UPI</div>
+          </div>
+          <div class="upi-opt" onclick="selectUPI(this,'amazonpay')">
+            <div class="upi-logo" style="background:#fff8e1;">🟡</div>
+            <div class="upi-name">Amazon Pay</div>
+          </div>
+          <div class="upi-opt" onclick="selectUPI(this,'other')">
+            <div class="upi-logo" style="background:#fce4ec;">🔴</div>
+            <div class="upi-name">Other UPI</div>
+          </div>
+        </div>
+
+        <div class="upi-id-field show" id="upiIdField">
+          <div class="pay-field" style="margin-bottom:10px;">
+            <label>UPI ID / VPA</label>
+            <input type="text" id="upiId" placeholder="yourname@upi" autocomplete="off">
+          </div>
+          <div style="font-size:12px;color:var(--muted);">OR scan QR code to pay instantly</div>
+        </div>
+
+        <div class="upi-qr-box" id="upiQR">
+          <div class="qr-img">
+            <!-- Simple QR pattern SVG -->
+            <svg class="qr-code-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <!-- QR border squares -->
+              <rect x="5" y="5" width="32" height="32" fill="none" stroke="#000" stroke-width="4"/>
+              <rect x="11" y="11" width="20" height="20" fill="#000"/>
+              <rect x="83" y="5" width="32" height="32" fill="none" stroke="#000" stroke-width="4"/>
+              <rect x="89" y="11" width="20" height="20" fill="#000"/>
+              <rect x="5" y="83" width="32" height="32" fill="none" stroke="#000" stroke-width="4"/>
+              <rect x="11" y="89" width="20" height="20" fill="#000"/>
+              <!-- data modules -->
+              <rect x="45" y="5" width="6" height="6" fill="#000"/>
+              <rect x="55" y="5" width="6" height="6" fill="#000"/>
+              <rect x="65" y="5" width="6" height="6" fill="#000"/>
+              <rect x="45" y="15" width="6" height="6" fill="#000"/>
+              <rect x="65" y="15" width="6" height="6" fill="#000"/>
+              <rect x="45" y="25" width="6" height="6" fill="#000"/>
+              <rect x="55" y="25" width="6" height="6" fill="#000"/>
+              <rect x="5" y="45" width="6" height="6" fill="#000"/>
+              <rect x="15" y="45" width="6" height="6" fill="#000"/>
+              <rect x="25" y="45" width="6" height="6" fill="#000"/>
+              <rect x="45" y="45" width="6" height="6" fill="#000"/>
+              <rect x="55" y="45" width="6" height="6" fill="#000"/>
+              <rect x="65" y="45" width="6" height="6" fill="#000"/>
+              <rect x="75" y="45" width="6" height="6" fill="#000"/>
+              <rect x="85" y="45" width="6" height="6" fill="#000"/>
+              <rect x="95" y="45" width="6" height="6" fill="#000"/>
+              <rect x="109" y="45" width="6" height="6" fill="#000"/>
+              <rect x="5" y="55" width="6" height="6" fill="#000"/>
+              <rect x="25" y="55" width="6" height="6" fill="#000"/>
+              <rect x="45" y="55" width="6" height="6" fill="#000"/>
+              <rect x="65" y="55" width="6" height="6" fill="#000"/>
+              <rect x="85" y="55" width="6" height="6" fill="#000"/>
+              <rect x="109" y="55" width="6" height="6" fill="#000"/>
+              <rect x="5" y="65" width="6" height="6" fill="#000"/>
+              <rect x="15" y="65" width="6" height="6" fill="#000"/>
+              <rect x="35" y="65" width="6" height="6" fill="#000"/>
+              <rect x="55" y="65" width="6" height="6" fill="#000"/>
+              <rect x="75" y="65" width="6" height="6" fill="#000"/>
+              <rect x="95" y="65" width="6" height="6" fill="#000"/>
+              <rect x="109" y="65" width="6" height="6" fill="#000"/>
+              <rect x="45" y="75" width="6" height="6" fill="#000"/>
+              <rect x="55" y="75" width="6" height="6" fill="#000"/>
+              <rect x="65" y="75" width="6" height="6" fill="#000"/>
+              <rect x="85" y="75" width="6" height="6" fill="#000"/>
+              <rect x="45" y="85" width="6" height="6" fill="#000"/>
+              <rect x="65" y="85" width="6" height="6" fill="#000"/>
+              <rect x="85" y="85" width="6" height="6" fill="#000"/>
+              <rect x="95" y="85" width="6" height="6" fill="#000"/>
+              <rect x="109" y="85" width="6" height="6" fill="#000"/>
+              <rect x="45" y="95" width="6" height="6" fill="#000"/>
+              <rect x="55" y="95" width="6" height="6" fill="#000"/>
+              <rect x="75" y="95" width="6" height="6" fill="#000"/>
+              <rect x="109" y="95" width="6" height="6" fill="#000"/>
+              <rect x="45" y="109" width="6" height="6" fill="#000"/>
+              <rect x="65" y="109" width="6" height="6" fill="#000"/>
+              <rect x="85" y="109" width="6" height="6" fill="#000"/>
+              <rect x="95" y="109" width="6" height="6" fill="#000"/>
+            </svg>
+          </div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Scan with any UPI app<br><strong style="color:var(--text);">travelgo@upi</strong></div>
+        </div>
+      </div>
+
+      <!-- CARD PANEL -->
+      <div class="method-panel" id="panel-card">
+        <div class="card-type-toggle">
+          <button class="card-type-btn active" onclick="setCardType(this,'credit')">💳 Credit Card</button>
+          <button class="card-type-btn" onclick="setCardType(this,'debit')">🏧 Debit Card</button>
+        </div>
+
+        <!-- Card preview -->
+        <div class="card-preview" id="cardPreview">
+          <div class="card-chip">💳</div>
+          <div class="card-number-display" id="previewNumber">•••• •••• •••• ••••</div>
+          <div class="card-bottom">
+            <div>
+              <div class="card-holder-label">Card Holder</div>
+              <div class="card-holder-val" id="previewName">YOUR NAME</div>
+            </div>
+            <div>
+              <div class="card-exp-label">Expires</div>
+              <div class="card-exp-val" id="previewExp">MM/YY</div>
+            </div>
+            <div class="card-brand" id="cardBrand">💳</div>
+          </div>
+        </div>
+
+        <div class="pay-field">
+          <label>Card Number</label>
+          <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"
+            oninput="formatCardNumber(this)" autocomplete="cc-number">
+        </div>
+        <div class="pay-field">
+          <label>Name on Card</label>
+          <input type="text" id="cardName" placeholder="As printed on card"
+            oninput="document.getElementById('previewName').textContent=this.value.toUpperCase()||'YOUR NAME'" autocomplete="cc-name">
+        </div>
+        <div class="pay-row-3">
+          <div class="pay-field" style="margin-bottom:0;">
+            <label>Expiry Month</label>
+            <select id="cardMonth" onchange="updateExpPreview()" autocomplete="cc-exp-month">
+              <option value="">Month</option>
+              <option>01</option><option>02</option><option>03</option><option>04</option>
+              <option>05</option><option>06</option><option>07</option><option>08</option>
+              <option>09</option><option>10</option><option>11</option><option>12</option>
+            </select>
+          </div>
+          <div class="pay-field" style="margin-bottom:0;">
+            <label>Expiry Year</label>
+            <select id="cardYear" onchange="updateExpPreview()" autocomplete="cc-exp-year">
+              <option value="">Year</option>
+              <option>2026</option><option>2027</option><option>2028</option><option>2029</option>
+              <option>2030</option><option>2031</option><option>2032</option>
+            </select>
+          </div>
+          <div class="pay-field" style="margin-bottom:0;">
+            <label>CVV / CVC</label>
+            <input type="password" id="cardCVV" placeholder="•••" maxlength="4" autocomplete="cc-csc"
+              style="letter-spacing:4px;">
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
+          <span>🔒</span> Your card details are encrypted and never stored.
+        </div>
+
+        <!-- Accepted cards -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center;">
+          <span style="font-size:11px;color:var(--muted);font-weight:700;margin-right:4px;">ACCEPTED:</span>
+          <div class="trust-logo" style="background:#1a1f71;color:#fff;font-size:13px;padding:5px 12px;">VISA</div>
+          <div class="trust-logo" style="background:#eb001b;color:#fff;border:none;font-size:12px;">MC</div>
+          <div class="trust-logo" style="background:#2e77bc;color:#fff;border:none;">AMEX</div>
+          <div class="trust-logo" style="background:#f47216;color:#fff;border:none;">DISCOVER</div>
+          <div class="trust-logo">RuPay</div>
+          <div class="trust-logo">Maestro</div>
+        </div>
+      </div>
+
+      <!-- NET BANKING PANEL -->
+      <div class="method-panel" id="panel-netbanking">
+        <div style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px;">Popular Banks</div>
+        <div class="bank-grid">
+          <div class="bank-opt" onclick="selectBank(this)">
+            <div class="bank-logo">🏛️</div>
+            <div class="bank-name">SBI</div>
+          </div>
+          <div class="bank-opt" onclick="selectBank(this)">
+            <div class="bank-logo">🔵</div>
+            <div class="bank-name">HDFC Bank</div>
+          </div>
+          <div class="bank-opt" onclick="selectBank(this)">
+            <div class="bank-logo">🟠</div>
+            <div class="bank-name">ICICI Bank</div>
+          </div>
+          <div class="bank-opt" onclick="selectBank(this)">
+            <div class="bank-logo">🟢</div>
+            <div class="bank-name">Axis Bank</div>
+          </div>
+          <div class="bank-opt" onclick="selectBank(this)">
+            <div class="bank-logo">🔴</div>
+            <div class="bank-name">Kotak Bank</div>
+          </div>
+          <div class="bank-opt" onclick="selectBank(this)">
+            <div class="bank-logo">💛</div>
+            <div class="bank-name">PNB</div>
+          </div>
+        </div>
+        <select class="other-bank-select" onchange="selectOtherBank(this)">
+          <option value="">— Select other bank —</option>
+          <option>Bank of Baroda</option>
+          <option>Canara Bank</option>
+          <option>Union Bank</option>
+          <option>Bank of India</option>
+          <option>IndusInd Bank</option>
+          <option>Yes Bank</option>
+          <option>Federal Bank</option>
+          <option>IDFC First Bank</option>
+          <option>UCO Bank</option>
+          <option>Karnataka Bank</option>
+        </select>
+      </div>
+
+      <!-- WALLET PANEL -->
+      <div class="method-panel" id="panel-wallet">
+        <div style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px;">Choose Wallet</div>
+        <div class="wallet-grid">
+          <div class="wallet-opt" onclick="selectWallet(this)">
+            <div class="wallet-logo">💙</div>
+            <div class="wallet-name">Paytm Wallet</div>
+          </div>
+          <div class="wallet-opt" onclick="selectWallet(this)">
+            <div class="wallet-logo">🟡</div>
+            <div class="wallet-name">Amazon Pay</div>
+          </div>
+          <div class="wallet-opt" onclick="selectWallet(this)">
+            <div class="wallet-logo">🟠</div>
+            <div class="wallet-name">Mobikwik</div>
+          </div>
+          <div class="wallet-opt" onclick="selectWallet(this)">
+            <div class="wallet-logo">🟢</div>
+            <div class="wallet-name">Freecharge</div>
+          </div>
+          <div class="wallet-opt" onclick="selectWallet(this)">
+            <div class="wallet-logo">🔵</div>
+            <div class="wallet-name">Jio Money</div>
+          </div>
+          <div class="wallet-opt" onclick="selectWallet(this)">
+            <div class="wallet-logo">🔴</div>
+            <div class="wallet-name">Airtel Money</div>
+          </div>
+        </div>
+        <div class="pay-field" style="margin-top:4px;">
+          <label>Registered Mobile Number</label>
+          <input type="tel" id="walletPhone" placeholder="+91 98765 43210" maxlength="15">
+        </div>
+      </div>
+
+      <!-- PROMO CODE -->
+      <div style="margin-top:24px;padding-top:20px;border-top:1.5px dashed var(--border);">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">🏷️ Have a promo code?</div>
+        <div class="promo-row">
+          <input type="text" class="promo-input" id="promoCode" placeholder="Enter code e.g. TRAVEL100">
+          <button class="promo-btn" onclick="applyPromo()">Apply</button>
+        </div>
+        <div class="promo-success" id="promoSuccess">✅ Promo code applied! You saved <span id="promoSaved"></span></div>
+      </div>
+
+      <!-- PAY NOW -->
+      <button class="pay-now-btn" onclick="processPayment()">
+        🔐 Pay <span id="payBtnAmt">Now</span>
+      </button>
+      <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:10px;">
+        By completing this payment you agree to TravelGo's <a href="#" style="color:var(--accent);">Terms & Conditions</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Order Summary -->
+  <div class="order-summary">
+    <div class="summary-title">🧾 Order Summary</div>
+
+    <div class="summary-item">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;" id="sumBookingTitle">Your Booking</div>
+        <div class="si-label" id="sumBookingDetail">—</div>
+      </div>
+    </div>
+
+    <div class="summary-item">
+      <div class="si-label">Base Fare</div>
+      <div class="si-val" id="sumBase">₹0</div>
+    </div>
+    <div class="summary-item">
+      <div class="si-label">Taxes & Fees (18% GST)</div>
+      <div class="si-val" id="sumTax">₹0</div>
+    </div>
+    <div class="summary-item">
+      <div class="si-label">Convenience Fee</div>
+      <div class="si-val" id="sumFee">₹59</div>
+    </div>
+    <div class="summary-item" id="sumDiscountRow" style="display:none;">
+      <div class="si-label" style="color:var(--green);">🏷️ Promo Discount</div>
+      <div class="si-val" style="color:var(--green);" id="sumDiscount">–₹0</div>
+    </div>
+
+    <div class="summary-divider"></div>
+    <div class="summary-total">
+      <div class="st-label">Total</div>
+      <div class="st-val" id="sumTotal">₹0</div>
+    </div>
+
+    <div class="secure-badge">
+      🔒 Your payment is 100% secure & encrypted
+    </div>
+
+    <div class="trust-logos">
+      <div class="trust-logo">PCI DSS</div>
+      <div class="trust-logo">256-bit SSL</div>
+      <div class="trust-logo">RBI Licensed</div>
+      <div class="trust-logo">ISO 27001</div>
+    </div>
+  </div>
+</div>
+
+<!-- Processing Overlay -->
+<div id="processingOverlay">
+  <div class="processing-card">
+    <div class="processing-icon" id="processingIcon">⏳</div>
+    <div class="processing-title" id="processingTitle">Processing Payment</div>
+    <div class="processing-sub" id="processingSub">Please wait while we securely process your payment. Do not close this window.</div>
+    <div class="spinner" id="processingSpinner"></div>
+  </div>
+</div>
+
+<!-- Success Screen -->
+<div id="successScreen" class="success-screen">
+  <div class="success-card">
+    <div class="success-tick">✅</div>
+    <div class="success-title">Payment Successful!</div>
+    <div class="success-sub">Your booking is confirmed. E-ticket and invoice have been sent to your email.</div>
+    <div class="booking-ref">
+      <div class="ref-label">Booking Reference</div>
+      <div class="ref-val" id="bookingRef">TG-2026-XXXXXX</div>
+    </div>
+    <div class="success-btns">
+      <button class="success-btn-primary" onclick="window.location.href='mybookings.html'">View Bookings</button>
+      <button class="success-btn-secondary" onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── READ BOOKING DATA FROM URL / LOCALSTORAGE ──
+const params = new URLSearchParams(window.location.search);
+let bookingData = null;
+
+// Try URL params first, then localStorage pending booking
+try {
+  const raw = params.get('data');
+  if (raw) bookingData = JSON.parse(decodeURIComponent(raw));
+} catch(e) {}
+
+if (!bookingData) {
+  try {
+    const pending = localStorage.getItem('travelgo_pending_payment');
+    if (pending) bookingData = JSON.parse(pending);
+  } catch(e) {}
+}
+
+if (!bookingData) {
+  // Fallback demo data
+  bookingData = {
+    type: 'flight',
+    title: 'IndiGo · Chennai → Mumbai',
+    detail: 'Economy · 1 Adult · 06:00 → 08:10',
+    price: '₹3,499',
+    priceNum: 3499
+  };
+}
+
+// ── POPULATE SUMMARY ──
+function populateSummary() {
+  const base = bookingData.priceNum || 0;
+  const tax = Math.round(base * 0.18);
+  const fee = 59;
+  const total = base + tax + fee;
+
+  document.getElementById('sumBookingTitle').textContent = bookingData.title || 'Your Booking';
+  document.getElementById('sumBookingDetail').textContent = bookingData.detail || (bookingData.route || bookingData.hotelName || '');
+  document.getElementById('sumBase').textContent = '₹' + base.toLocaleString('en-IN');
+  document.getElementById('sumTax').textContent = '₹' + tax.toLocaleString('en-IN');
+  document.getElementById('sumTotal').textContent = '₹' + total.toLocaleString('en-IN');
+  document.getElementById('payBtnAmt').textContent = '₹' + total.toLocaleString('en-IN');
+
+  // Breadcrumb
+  const typeMap = { flight: 'Flights', hotel: 'Hotels', train: 'Trains', movie: 'Movies' };
+  const backHref = (bookingData.type || '') + '.html';
+  document.getElementById('breadcrumbBack').href = backHref;
+  document.getElementById('breadcrumbBack').textContent = typeMap[bookingData.type] || 'Booking';
+}
+
+populateSummary();
+
+// ── PAYMENT METHOD SWITCHING ──
+let currentMethod = 'upi';
+function switchMethod(method, btn) {
+  document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.method-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + method).classList.add('active');
+  currentMethod = method;
+}
+
+// ── UPI ──
+let selectedUPIApp = 'gpay';
+function selectUPI(el, app) {
+  document.querySelectorAll('.upi-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedUPIApp = app;
+  document.getElementById('upiIdField').className = 'upi-id-field ' + (app !== 'qr' ? 'show' : '');
+  document.getElementById('upiQR').className = 'upi-qr-box' + (app === 'qr' ? ' show' : '');
+}
+
+// ── CARD ──
+let cardType = 'credit';
+function setCardType(btn, type) {
+  document.querySelectorAll('.card-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  cardType = type;
+}
+
+function formatCardNumber(input) {
+  let val = input.value.replace(/\D/g, '').substring(0, 16);
+  val = val.replace(/(.{4})/g, '$1 ').trim();
+  input.value = val;
+  // Update preview
+  const preview = val.padEnd(19, '•').replace(/[0-9]/g, d => d).substring(0, 19);
+  document.getElementById('previewNumber').textContent = val || '•••• •••• •••• ••••';
+  // Detect brand
+  const raw = val.replace(/\s/g, '');
+  const brand = document.getElementById('cardBrand');
+  if (raw.startsWith('4')) brand.textContent = '🔵 VISA';
+  else if (/^5[1-5]/.test(raw)) brand.textContent = '🔴 MC';
+  else if (/^3[47]/.test(raw)) brand.textContent = '🟢 AMEX';
+  else if (raw.startsWith('6')) brand.textContent = '🟠 RUPAY';
+  else brand.textContent = '💳';
+}
+
+function updateExpPreview() {
+  const m = document.getElementById('cardMonth').value;
+  const y = (document.getElementById('cardYear').value || 'YYYY').slice(2);
+  document.getElementById('previewExp').textContent = (m || 'MM') + '/' + y;
+}
+
+// ── NET BANKING ──
+function selectBank(el) {
+  document.querySelectorAll('.bank-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.querySelector('.other-bank-select').value = '';
+}
+function selectOtherBank(sel) {
+  if (sel.value) document.querySelectorAll('.bank-opt').forEach(o => o.classList.remove('selected'));
+}
+
+// ── WALLET ──
+function selectWallet(el) {
+  document.querySelectorAll('.wallet-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── PROMO CODE ──
+const PROMOS = { 'TRAVEL100': 100, 'TRAVELGO10': 10, 'NEWUSER': 200, 'FIRSTBOOK': 150 };
+let promoDiscount = 0;
+function applyPromo() {
+  const code = document.getElementById('promoCode').value.trim().toUpperCase();
+  if (!code) { alert('Please enter a promo code.'); return; }
+  if (PROMOS[code]) {
+    const disc = PROMOS[code];
+    const base = bookingData.priceNum || 0;
+    // Percentage vs flat
+    const discAmt = disc <= 20 ? Math.round(base * disc / 100) : disc;
+    promoDiscount = discAmt;
+    document.getElementById('promoSaved').textContent = '₹' + discAmt.toLocaleString('en-IN');
+    document.getElementById('promoSuccess').style.display = 'block';
+    document.getElementById('sumDiscountRow').style.display = 'flex';
+    document.getElementById('sumDiscount').textContent = '–₹' + discAmt.toLocaleString('en-IN');
+    // Recalculate total
+    const base2 = base;
+    const tax = Math.round(base2 * 0.18);
+    const fee = 59;
+    const total = Math.max(0, base2 + tax + fee - discAmt);
+    document.getElementById('sumTotal').textContent = '₹' + total.toLocaleString('en-IN');
+    document.getElementById('payBtnAmt').textContent = '₹' + total.toLocaleString('en-IN');
+  } else {
+    alert('❌ Invalid promo code. Try: TRAVEL100, NEWUSER, or FIRSTBOOK');
+  }
+}
+
+// ── VALIDATION ──
+function validate() {
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
+  if (!name) { alert('Please enter your full name.'); return false; }
+  if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return false; }
+  if (!phone || phone.replace(/\D/g,'').length < 10) { alert('Please enter a valid mobile number.'); return false; }
+
+  if (currentMethod === 'upi') {
+    const upiId = document.getElementById('upiId').value.trim();
+    if (!upiId || !upiId.includes('@')) { alert('Please enter your UPI ID (e.g. name@upi)'); return false; }
+  } else if (currentMethod === 'card') {
+    const num = document.getElementById('cardNumber').value.replace(/\s/g,'');
+    if (num.length < 16) { alert('Please enter a valid 16-digit card number.'); return false; }
+    if (!document.getElementById('cardName').value.trim()) { alert('Please enter the name on your card.'); return false; }
+    if (!document.getElementById('cardMonth').value) { alert('Please select expiry month.'); return false; }
+    if (!document.getElementById('cardYear').value) { alert('Please select expiry year.'); return false; }
+    const cvv = document.getElementById('cardCVV').value.trim();
+    if (cvv.length < 3) { alert('Please enter a valid CVV.'); return false; }
+  } else if (currentMethod === 'netbanking') {
+    const sel = document.querySelectorAll('.bank-opt.selected');
+    const otherSel = document.querySelector('.other-bank-select').value;
+    if (!sel.length && !otherSel) { alert('Please select your bank.'); return false; }
+  } else if (currentMethod === 'wallet') {
+    const sel = document.querySelectorAll('.wallet-opt.selected');
+    if (!sel.length) { alert('Please select a wallet.'); return false; }
+    const wp = document.getElementById('walletPhone').value.trim();
+    if (!wp || wp.replace(/\D/g,'').length < 10) { alert('Please enter your registered mobile number.'); return false; }
+  }
+  return true;
+}
+
+// ── PROCESS PAYMENT ──
+function processPayment() {
+  if (!validate()) return;
+  const overlay = document.getElementById('processingOverlay');
+  overlay.classList.add('show');
+
+  // Simulate OTP / bank redirect step
+  setTimeout(() => {
+    document.getElementById('processingTitle').textContent = 'Verifying Payment';
+    document.getElementById('processingSub').textContent = 'Contacting your bank securely...';
+  }, 1200);
+
+  setTimeout(() => {
+    document.getElementById('processingTitle').textContent = 'Almost Done!';
+    document.getElementById('processingSub').textContent = 'Confirming your booking...';
+  }, 2600);
+
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    showSuccess();
+  }, 4000);
+}
+
+function showSuccess() {
+  // Generate booking reference
+  const ref = 'TG-' + new Date().getFullYear() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  document.getElementById('bookingRef').textContent = ref;
+
+  // Save to bookings
+  const booking = {
+    ...bookingData,
+    ref,
+    paidAt: new Date().toISOString(),
+    paymentMethod: currentMethod,
+    status: 'confirmed'
+  };
+  const bookings = JSON.parse(localStorage.getItem('travelgo_bookings') || '[]');
+  bookings.push(booking);
+  localStorage.setItem('travelgo_bookings', JSON.stringify(bookings));
+  localStorage.removeItem('travelgo_pending_payment');
+
+  document.getElementById('successScreen').classList.add('show');
+}
+</script>
+<script src="navbar.js"></script>
+<script src="animations.js"></script>
+</body>
+</html>

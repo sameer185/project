@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelGo | Movie Tickets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="animations.css">
+<link rel="stylesheet" href="common.css">
+<script src="stateCity.js"></script>
+<style>
+:root{--red:#dc2626;--red-light:#fef2f2;--red-glow:rgba(220,38,38,0.2);}
+.page-hero{background:linear-gradient(135deg,var(--red-light) 0%,var(--bg) 65%);}
+.fbadge.new{border-color:var(--red);color:var(--red);background:var(--red-light);}
+.search-btn{background:linear-gradient(135deg,var(--red),#b91c1c);box-shadow:0 6px 24px var(--red-glow);}
+.search-btn:hover{box-shadow:0 10px 30px var(--red-glow);}
+.form-row-four{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;}
+
+.sensory-banner{background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:1.5px solid #e879f9;
+  border-radius:var(--radius);padding:22px 28px;display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;}
+.sb-icon{font-size:36px;margin-top:2px;flex-shrink:0;}
+.sb-text h4{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#701a75;margin-bottom:4px;}
+.sb-text p{font-size:13px;color:#86198f;margin-bottom:12px;line-height:1.55;}
+.sensory-types{display:flex;gap:8px;flex-wrap:wrap;}
+.stype{display:inline-flex;align-items:center;gap:5px;background:white;border:1.5px solid #e879f9;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:600;color:#701a75;}
+
+.ar-banner{background:linear-gradient(135deg,var(--accent-light),#e0f2fe);border:1.5px solid #7dd3fc;border-radius:var(--radius);padding:22px 28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.ar-icon{font-size:36px;flex-shrink:0;}
+.ar-text h4{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#0c4a6e;margin-bottom:4px;}
+.ar-text p{font-size:13px;color:#075985;line-height:1.55;}
+.ar-launch-btn{margin-left:auto;align-self:center;padding:10px 22px;background:var(--accent);color:white;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;}
+
+.movies-section{padding:24px 5% 50px;display:none;}
+.section-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;margin-bottom:20px;color:var(--text);}
+.movies-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:18px;margin-bottom:28px;}
+.movie-card{background:white;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all 0.3s;position:relative;}
+.movie-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,0.1);}
+.movie-card.selected{border-color:var(--red);box-shadow:0 0 0 2px var(--red),0 12px 32px rgba(220,38,38,0.15);}
+.movie-poster{height:250px;overflow:hidden;position:relative;}
+.movie-poster img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
+.movie-card:hover .movie-poster img{transform:scale(1.04);}
+.movie-info{padding:14px;}
+.movie-badge{display:inline-block;background:var(--red-light);color:var(--red);font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:5px;text-transform:uppercase;}
+.movie-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:3px;}
+.movie-meta{font-size:11px;color:var(--muted);}
+.sensory-chip{position:absolute;top:8px;left:8px;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:4px;}
+.sc-haptic{background:#701a75;color:white;} .sc-scent{background:#0c4a6e;color:white;} .sc-standard{background:rgba(0,0,0,0.5);color:white;}
+
+.sensory-panel{background:linear-gradient(135deg,#fdf4ff,white);border:1.5px solid #e879f9;border-radius:var(--radius);padding:24px;margin-bottom:20px;display:none;}
+.sensory-panel h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:800;color:#701a75;margin-bottom:6px;}
+.sensory-panel p{font-size:13px;color:#86198f;margin-bottom:16px;}
+.addon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+.addon-card{background:white;border:1.5px solid #f5d0fe;border-radius:var(--radius-sm);padding:16px;cursor:pointer;transition:all 0.25s;}
+.addon-card:hover,.addon-card.selected{border-color:#e879f9;background:#fdf4ff;}
+.addon-card.selected{border-color:#a21caf;box-shadow:0 0 0 2px #e879f9;}
+.addon-icon{font-size:30px;margin-bottom:10px;}
+.addon-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:5px;}
+.addon-desc{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.55;}
+.addon-price{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#a21caf;}
+
+.showtime-section{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;display:none;box-shadow:0 2px 12px rgba(0,0,0,0.04);}
+.showtime-section h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:16px;}
+.times-grid{display:flex;gap:10px;flex-wrap:wrap;}
+.time-btn{padding:10px 20px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.25s;position:relative;}
+.time-btn:hover,.time-btn.active{background:var(--red-light);border-color:var(--red);color:var(--red);font-weight:700;}
+.sensory-dot{position:absolute;top:-4px;right:-4px;width:8px;height:8px;border-radius:50%;background:#e879f9;border:2px solid white;}
+
+.seat-section{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;display:none;box-shadow:0 2px 12px rgba(0,0,0,0.04);}
+.seat-section h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+.seat-section p{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.screen{background:linear-gradient(180deg,#dbeafe,transparent);border-radius:4px 4px 0 0;text-align:center;padding:12px;font-size:12px;color:var(--accent);letter-spacing:4px;font-weight:700;margin-bottom:20px;}
+.seat-grid{display:flex;flex-direction:column;align-items:center;gap:7px;}
+.seat-row{display:flex;gap:5px;align-items:center;}
+.row-label{width:22px;font-size:11px;color:var(--muted);text-align:center;font-weight:700;}
+.seat{width:30px;height:26px;border-radius:5px 5px 0 0;cursor:pointer;border:none;font-size:9px;font-weight:600;transition:all 0.15s;}
+.seat.free{background:#e2e8f0;color:#94a3b8;} .seat.free:hover{background:#bfdbfe;color:var(--accent);}
+.seat.taken{background:#f1f5f9;color:#cbd5e1;cursor:not-allowed;}
+.seat.selected{background:var(--red);color:white;}
+.seat.haptic{background:#f5d0fe;color:#701a75;} .seat.haptic:hover{background:#e879f9;color:white;}
+.seat.haptic.selected{background:#a21caf;color:white;}
+.seat-gap{width:12px;}
+.seat-legend{display:flex;gap:16px;margin-top:16px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--muted);}
+.legend-item{display:flex;align-items:center;gap:5px;font-weight:500;}
+.legend-dot{width:14px;height:14px;border-radius:3px;}
+
+.ar-panel{background:linear-gradient(135deg,#0c4a6e,#0369a1);border-radius:var(--radius);padding:28px;margin-bottom:20px;display:none;color:white;}
+.ar-panel h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:800;margin-bottom:6px;}
+.ar-panel p{font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:22px;}
+.ar-demo{background:rgba(0,0,0,0.35);border-radius:var(--radius-sm);height:220px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:18px;}
+.ar-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.06) 1px,transparent 1px);background-size:30px 30px;}
+.ar-arrow{position:absolute;font-size:44px;animation:arFloat 1.5s ease-in-out infinite;}
+@keyframes arFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.ar-seat-target{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);background:rgba(29,78,216,0.85);border:2px solid white;color:white;padding:7px 18px;border-radius:100px;font-size:13px;font-weight:700;}
+.ar-instructions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.ar-step{background:rgba(255,255,255,0.1);border-radius:var(--radius-sm);padding:14px;flex:1;min-width:140px;font-size:12px;line-height:1.55;}
+.ar-step strong{display:block;font-size:14px;margin-bottom:4px;}
+.ar-launch-main{padding:12px 28px;background:white;color:var(--accent);border:none;border-radius:var(--radius-sm);font-family:'Playfair Display',serif;font-weight:700;font-size:15px;cursor:pointer;}
+
+.summary-bar{background:var(--accent);border-radius:var(--radius);padding:18px 24px;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;box-shadow:0 8px 30px var(--accent-glow);margin-bottom:22px;}
+.summary-info{font-size:13px;color:rgba(255,255,255,0.85);}
+.summary-info strong{color:white;font-family:'Playfair Display',serif;font-size:16px;}
+.confirm-btn{padding:12px 28px;background:white;color:var(--accent);border:none;border-radius:var(--radius-sm);font-family:'Playfair Display',serif;font-weight:700;font-size:15px;cursor:pointer;}
+
+.ar-modal{background:#0c4a6e;border-radius:var(--radius-lg);max-width:500px;width:92%;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.5);animation:scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;}
+.ar-modal-header{padding:22px 26px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.1);}
+.ar-modal-header h3{font-family:'Playfair Display',serif;color:white;font-size:19px;font-weight:700;}
+.ar-modal-close{background:rgba(255,255,255,0.1);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.ar-modal-body{padding:26px;}
+.ar-phone-frame{width:100%;background:rgba(0,0,0,0.4);border-radius:var(--radius-sm);height:260px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:18px;}
+.ar-float-arrow{font-size:52px;position:relative;z-index:1;animation:arFloat 1.2s ease-in-out infinite;}
+.ar-seat-label{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:#2563eb;color:white;padding:7px 22px;border-radius:100px;font-size:14px;font-weight:700;white-space:nowrap;}
+.ar-modal-steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;color:white;}
+.ar-modal-step{background:rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:14px;text-align:center;}
+.ar-modal-step .step-icon{font-size:24px;margin-bottom:7px;}
+.ar-modal-step .step-text{font-size:11px;color:rgba(255,255,255,0.7);line-height:1.5;}
+@media(max-width:700px){.form-row-four{grid-template-columns:1fr 1fr;}.addon-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="logo">TravelGo</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a><a href="flight.html">Flights</a><a href="train.html">Trains</a>
+    <a href="hotel.html">Hotels</a><a href="movie.html" class="active">Movies</a>
+    <a href="mybookings.html">My Bookings</a><a href="login.html">Login</a>
+    <a href="signup.html" class="nav-cta">Sign Up</a>
+  </div>
+</nav>
+<div class="page-hero">
+  <div class="breadcrumb"><a href="index.html">Home</a> &rarr; Movies</div>
+  <h1>&#127916; Movie Tickets</h1>
+  <p>Beyond the screen &mdash; sensory tickets, AR seat finder, and immersive cinema.</p>
+  <div class="feature-badges">
+    <div class="fbadge new">&#127917; Sensory Add-on Tickets</div>
+    <div class="fbadge new">&#128241; AR Seat Finder</div>
+    <div class="fbadge">&#128250; Interactive Seat Map</div>
+  </div>
+</div>
+<div style="padding:28px 5% 0;display:flex;flex-direction:column;gap:14px;">
+  <div class="sensory-banner">
+    <div class="sb-icon">&#127917;</div>
+    <div class="sb-text">
+      <h4>Sensory "Add-on" Tickets &mdash; Welcome to 2026 Cinema</h4>
+      <p>Some screens now offer next-level immersive experiences. Look for sensory tags when you book.</p>
+      <div class="sensory-types">
+        <div class="stype">&#128250; Haptic Feedback Seats</div>
+        <div class="stype">&#127800; Scent-Diffusion</div>
+        <div class="stype">&#128168; Wind + Temperature Effects</div>
+        <div class="stype">&#127754; 4D Motion Seats</div>
+      </div>
+    </div>
+  </div>
+  <div class="ar-banner">
+    <div class="ar-icon">&#128241;</div>
+    <div class="ar-text">
+      <h4>AR Seat Finder &mdash; Walk Right to Your Seat</h4>
+      <p>After booking, open your phone camera inside the cinema. An AR arrow guides you directly to your seat.</p>
+    </div>
+    <button class="ar-launch-btn" onclick="openARModal()">Try AR Demo</button>
+  </div>
+</div>
+<div class="booking-section" style="padding-top:28px;">
+  <div class="form-card">
+    <div class="form-row-four">
+      <div class="field"><label>State</label><select id="mState"></select></div>
+      <div class="field"><label>City</label><select id="mCity" disabled></select></div>
+      <div class="field"><label>Date</label><input type="date" id="mDate"></div>
+      <div class="field"><label>Language</label>
+        <select id="mLang"><option>All</option><option>Tamil</option><option>Hindi</option><option>Telugu</option><option>English</option><option>Malayalam</option></select>
+      </div>
+    </div>
+    <button class="search-btn" onclick="searchMovies()">Search Movies &rarr;</button>
+  </div>
+</div>
+<div class="movies-section" id="moviesSection">
+  <div class="section-title">&#127916; Now Showing</div>
+  <div class="movies-grid" id="moviesGrid"></div>
+  <div class="sensory-panel" id="sensoryPanel">
+    <h3>&#127917; Choose Your Sensory Experience</h3>
+    <p id="sensoryPanelSub">Upgrade your experience:</p>
+    <div class="addon-grid" id="addonGrid"></div>
+  </div>
+  <div class="showtime-section" id="showtimeSection">
+    <h3 id="showtimeTitle">Select Showtime</h3>
+    <div class="times-grid" id="timesGrid"></div>
+  </div>
+  <div class="seat-section" id="seatSection">
+    <h3>Select Your Seats</h3>
+    <p id="seatSubtitle">Click seats to select. Purple = Haptic Feedback (+&#8377;80 each).</p>
+    <div class="screen">&#10022; &nbsp; SCREEN &mdash; ALL EYES THIS WAY &nbsp; &#10022;</div>
+    <div class="seat-grid" id="seatGrid"></div>
+    <div class="seat-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#e2e8f0;"></div>Standard</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f5d0fe;"></div>Haptic (+&#8377;80)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div>Selected</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f1f5f9;border:1px solid var(--border);"></div>Taken</div>
+    </div>
+  </div>
+  <div class="ar-panel" id="arPanel">
+    <h3>&#128241; AR Seat Finder is Ready!</h3>
+    <p>Your tickets are booked. When you arrive at the cinema, use AR Seat Finder to go straight to your seat.</p>
+    <div class="ar-demo">
+      <div class="ar-grid-bg"></div>
+      <div class="ar-arrow">&#11015;&#65039;</div>
+      <div class="ar-seat-target" id="arSeatTarget">&rarr; Row E &middot; Seat 5</div>
+    </div>
+    <div class="ar-instructions">
+      <div class="ar-step"><strong>1. Enter Cinema</strong>Point your phone at the floor when you enter the main hall.</div>
+      <div class="ar-step"><strong>2. Follow Arrow</strong>A glowing AR arrow on your screen leads you to your row.</div>
+      <div class="ar-step"><strong>3. Arrive at Seat</strong>Arrow pulses when you reach your exact seat. Enjoy!</div>
+    </div>
+    <button class="ar-launch-main" onclick="openARModal()">&#128241; Launch AR Navigation</button>
+  </div>
+  <div class="summary-bar" id="summaryBar">
+    <div class="summary-info" id="summaryInfo"></div>
+    <button class="confirm-btn" onclick="confirmTickets()">Confirm &amp; Pay &rarr;</button>
+  </div>
+</div>
+<div class="modal-overlay" id="arModal">
+  <div class="ar-modal">
+    <div class="ar-modal-header">
+      <h3>&#128241; AR Seat Finder Demo</h3>
+      <button class="ar-modal-close" onclick="closeARModal()">&#10005;</button>
+    </div>
+    <div class="ar-modal-body">
+      <div class="ar-phone-frame">
+        <div class="ar-grid-bg"></div>
+        <div class="ar-float-arrow">&#11015;&#65039;</div>
+        <div class="ar-seat-label" id="arModalSeat">Row E &middot; Seat 7 &mdash; 12m ahead</div>
+      </div>
+      <div class="ar-modal-steps">
+        <div class="ar-modal-step"><div class="step-icon">&#128247;</div><div class="step-text">Open camera in the TravelGo app inside the cinema</div></div>
+        <div class="ar-modal-step"><div class="step-icon">&#11015;&#65039;</div><div class="step-text">Follow the glowing arrow on your phone screen</div></div>
+        <div class="ar-modal-step"><div class="step-icon">&#128250;</div><div class="step-text">Arrow pulses when you reach your exact seat</div></div>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:14px;text-align:center;">Works with all major cinemas. Requires TravelGo app v3.0+</p>
+    </div>
+  </div>
+</div>
+<script>
+document.getElementById('mDate').min=new Date().toISOString().split('T')[0];
+document.getElementById('mDate').value=new Date().toISOString().split('T')[0];
+wireStateCity('mState','mCity','Select City');
+var POSTERS={'Amaran':'https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?w=400&q=85','Vettaiyan':'https://images.unsplash.com/photo-1535016120720-40c646be5580?w=400&q=85','Kalki 2898 AD':'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&q=85','Lucky Baskhar':'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=400&q=85','Meiyazhagan':'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=85','Pushpa 2':'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&q=85','Stree 2':'https://images.unsplash.com/photo-1560109947-543149eceb16?w=400&q=85','Munjya':'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&q=85','Singham Returns':'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=400&q=85','Do Patti':'https://images.unsplash.com/photo-1616530940355-351fabd9524b?w=400&q=85','The Sabarmati Report':'https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?w=400&q=85','Animal Park':'https://images.unsplash.com/photo-1518639192441-8fce0a366e2e?w=400&q=85','Devara':'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=400&q=85','Saripodhaa Sanivaaram':'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=400&q=85','Guntur Kaaram':'https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?w=400&q=85','Manjummel Boys':'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=85','Aavesham':'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400&q=85','Premalu':'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=400&q=85','Kishkindha Kaandam':'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&q=85','Turbo':'https://images.unsplash.com/photo-1512070679279-8988d32161be?w=400&q=85','Bramayugam':'https://images.unsplash.com/photo-1596727147705-61a532a659bd?w=400&q=85','KGF Chapter 2':'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&q=85','UI The Movie':'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=400&q=85','Bagheera':'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=85','Dawshom Awbatar':'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&q=85'};
+var DP='https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&q=85';
+function poster(t){return POSTERS[t]||DP;}
+var SM={'Tamil Nadu':[{title:'Amaran',genre:'War Drama',rating:'9.3',badge:'MUST WATCH',lang:'Tamil',price:200,sensory:'haptic'},{title:'Vettaiyan',genre:'Action Crime',rating:'8.2',badge:'',lang:'Tamil',price:180,sensory:'scent'},{title:'Kalki 2898 AD',genre:'Sci-Fi Action',rating:'9.1',badge:'BLOCKBUSTER',lang:'Tamil',price:220,sensory:'standard'},{title:'Lucky Baskhar',genre:'Crime Thriller',rating:'8.5',badge:'NEW',lang:'Tamil',price:190,sensory:'haptic'},{title:'Meiyazhagan',genre:'Drama',rating:'8.8',badge:'CRITIC PICK',lang:'Tamil',price:170,sensory:'scent'}],'Maharashtra':[{title:'Pushpa 2',genre:'Action Drama',rating:'8.8',badge:'SUPERHIT',lang:'Hindi',price:200,sensory:'scent'},{title:'Stree 2',genre:'Horror Comedy',rating:'8.9',badge:'BLOCKBUSTER',lang:'Hindi',price:210,sensory:'haptic'},{title:'Munjya',genre:'Horror Comedy',rating:'7.8',badge:'NEW',lang:'Hindi',price:180,sensory:'standard'},{title:'Do Patti',genre:'Thriller',rating:'7.2',badge:'',lang:'Hindi',price:160,sensory:'scent'},{title:'The Sabarmati Report',genre:'Drama',rating:'8.0',badge:'CRITIC PICK',lang:'Hindi',price:180,sensory:'standard'}],'Telangana':[{title:'Kalki 2898 AD',genre:'Sci-Fi Action',rating:'9.1',badge:'BLOCKBUSTER',lang:'Telugu',price:220,sensory:'haptic'},{title:'Pushpa 2',genre:'Action Drama',rating:'8.8',badge:'SUPERHIT',lang:'Telugu',price:200,sensory:'scent'},{title:'Devara',genre:'Action Thriller',rating:'7.6',badge:'NEW',lang:'Telugu',price:190,sensory:'haptic'},{title:'Saripodhaa Sanivaaram',genre:'Action',rating:'7.9',badge:'',lang:'Telugu',price:170,sensory:'standard'},{title:'Guntur Kaaram',genre:'Drama Family',rating:'7.2',badge:'',lang:'Telugu',price:160,sensory:'scent'}],'Kerala':[{title:'Manjummel Boys',genre:'Adventure Drama',rating:'9.0',badge:'BLOCKBUSTER',lang:'Malayalam',price:190,sensory:'haptic'},{title:'Aavesham',genre:'Action Comedy',rating:'8.5',badge:'SUPERHIT',lang:'Malayalam',price:180,sensory:'scent'},{title:'Premalu',genre:'Romance Comedy',rating:'8.7',badge:'MUST WATCH',lang:'Malayalam',price:170,sensory:'standard'},{title:'Kishkindha Kaandam',genre:'Thriller',rating:'8.3',badge:'CRITIC PICK',lang:'Malayalam',price:180,sensory:'standard'},{title:'Bramayugam',genre:'Horror Thriller',rating:'9.1',badge:'MUST WATCH',lang:'Malayalam',price:190,sensory:'scent'}],'Karnataka':[{title:'KGF Chapter 2',genre:'Action Drama',rating:'8.4',badge:'LEGEND',lang:'Kannada',price:200,sensory:'haptic'},{title:'UI The Movie',genre:'Action Sci-Fi',rating:'7.5',badge:'NEW',lang:'Kannada',price:190,sensory:'haptic'},{title:'Bagheera',genre:'Action Thriller',rating:'7.8',badge:'',lang:'Kannada',price:180,sensory:'standard'}],'Delhi':[{title:'Stree 2',genre:'Horror Comedy',rating:'8.9',badge:'BLOCKBUSTER',lang:'Hindi',price:210,sensory:'haptic'},{title:'Pushpa 2',genre:'Action Drama',rating:'8.8',badge:'SUPERHIT',lang:'Hindi',price:200,sensory:'scent'},{title:'Singham Returns',genre:'Action',rating:'7.5',badge:'',lang:'Hindi',price:180,sensory:'standard'},{title:'Animal Park',genre:'Action Thriller',rating:'7.9',badge:'',lang:'Hindi',price:190,sensory:'standard'}],'West Bengal':[{title:'Stree 2',genre:'Horror Comedy',rating:'8.9',badge:'BLOCKBUSTER',lang:'Hindi',price:210,sensory:'haptic'},{title:'Pushpa 2',genre:'Action Drama',rating:'8.8',badge:'SUPERHIT',lang:'Bengali',price:190,sensory:'scent'},{title:'Dawshom Awbatar',genre:'Sci-Fi Bengali',rating:'7.9',badge:'NEW',lang:'Bengali',price:175,sensory:'haptic'}]};
+var DM=[{title:'Pushpa 2',genre:'Action Drama',rating:'8.8',badge:'SUPERHIT',lang:'Hindi',price:200,sensory:'scent'},{title:'Stree 2',genre:'Horror Comedy',rating:'8.9',badge:'BLOCKBUSTER',lang:'Hindi',price:210,sensory:'haptic'},{title:'Kalki 2898 AD',genre:'Sci-Fi Action',rating:'9.1',badge:'MUST WATCH',lang:'Hindi',price:220,sensory:'standard'},{title:'Munjya',genre:'Horror Comedy',rating:'7.8',badge:'NEW',lang:'Hindi',price:170,sensory:'haptic'},{title:'Animal Park',genre:'Action Thriller',rating:'7.9',badge:'',lang:'Hindi',price:190,sensory:'scent'}];
+function getMovies(state,lang){var list=SM[state]||DM;if(lang&&lang!=='All')list=list.filter(function(m){return m.lang===lang;});return list.length?list:DM;}
+var ADDONS=[{icon:'&#128250;',name:'Haptic Feedback Seats',desc:'Feel every explosion through your seat.',price:80},{icon:'&#127800;',name:'Scent-Diffusion',desc:'Aromas released during key scenes.',price:60},{icon:'&#128168;',name:'Wind + Temperature',desc:'Feel the breeze and warmth during scenes.',price:70},{icon:'&#9889;',name:'Standard (No Add-ons)',desc:'Classic cinema experience.',price:0}];
+var HR=['D','E','F'],TAKEN=new Set([2,5,8,12,15,20,22,30,35,40,42,45]);
+var selM=null,selA=null,selT=null,selS=new Set();
+function hide(){['sensoryPanel','showtimeSection','seatSection','arPanel','summaryBar'].forEach(function(id){document.getElementById(id).style.display='none';});}
+function searchMovies(){
+  var state=document.getElementById('mState').value,lang=document.getElementById('mLang').value;
+  var list=getMovies(state,lang);window._mv=list;
+  document.getElementById('moviesGrid').innerHTML=list.map(function(m,i){
+    var sc=m.sensory==='haptic'?'sc-haptic':m.sensory==='scent'?'sc-scent':'sc-standard';
+    var sl=m.sensory==='haptic'?'&#128250; Haptic':m.sensory==='scent'?'&#127800; Scent':'&#9889; Standard';
+    return '<div class="movie-card" id="mc'+i+'" onclick="selectMovie('+i+')"><div class="movie-poster"><img src="'+poster(m.title)+'" alt="'+m.title+'" loading="lazy" onerror="this.src=\''+DP+'\'"><div class="sensory-chip '+sc+'">'+sl+'</div></div><div class="movie-info">'+(m.badge?'<div class="movie-badge">'+m.badge+'</div>':'')+'<div class="movie-title">'+m.title+'</div><div class="movie-meta">'+m.genre+' &middot; &#11088; '+m.rating+'</div><div class="movie-meta" style="margin-top:2px;">'+m.lang+'</div></div></div>';
+  }).join('');
+  var sec=document.getElementById('moviesSection');sec.style.display='block';hide();
+  sec.scrollIntoView({behavior:'smooth'});
+}
+function selectMovie(i){
+  var list=window._mv||DM;selM=list[i];selA=null;selT=null;selS.clear();
+  document.querySelectorAll('.movie-card').forEach(function(c,j){c.classList.toggle('selected',j===i);});
+  document.getElementById('sensoryPanelSub').textContent='Upgrade your "'+selM.title+'" experience:';
+  document.getElementById('addonGrid').innerHTML=ADDONS.map(function(a,j){
+    return '<div class="addon-card" id="addon'+j+'" onclick="selectAddon('+j+')"><div class="addon-icon">'+a.icon+'</div><div class="addon-name">'+a.name+'</div><div class="addon-desc">'+a.desc+'</div><div class="addon-price">'+(a.price>0?'+&#8377;'+a.price+'/seat':'Included')+'</div></div>';
+  }).join('');
+  var sp=document.getElementById('sensoryPanel');sp.style.display='block';
+  ['showtimeSection','seatSection','arPanel','summaryBar'].forEach(function(id){document.getElementById(id).style.display='none';});
+  sp.scrollIntoView({behavior:'smooth'});
+}
+function selectAddon(i){
+  selA=ADDONS[i];
+  document.querySelectorAll('.addon-card').forEach(function(c,j){c.classList.toggle('selected',j===i);});
+  document.getElementById('showtimeTitle').textContent='Showtimes for "'+selM.title+'"';
+  document.getElementById('timesGrid').innerHTML=['10:00 AM','1:00 PM','4:00 PM','7:00 PM','10:00 PM'].map(function(t,j){
+    return '<button class="time-btn" onclick="selectTime(this,\''+t+'\')">'+t+(j<3?'<div class="sensory-dot"></div>':'')+'</button>';
+  }).join('');
+  var st=document.getElementById('showtimeSection');st.style.display='block';
+  ['seatSection','arPanel','summaryBar'].forEach(function(id){document.getElementById(id).style.display='none';});
+  st.scrollIntoView({behavior:'smooth'});
+}
+function selectTime(el,time){
+  selT=time;selS.clear();
+  document.querySelectorAll('.time-btn').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('seatSubtitle').textContent=selM.title+' \u00b7 '+time+' \u00b7 Base \u20b9'+selM.price+'/seat'+(selA&&selA.price>0?' + '+selA.name+' +\u20b9'+selA.price:'');
+  var rows=['A','B','C','D','E','F','G','H'];var idx=0;
+  document.getElementById('seatGrid').innerHTML=rows.map(function(row){
+    var isH=HR.includes(row)&&selA&&selA.name.includes('Haptic');
+    var seats=Array.from({length:10},function(_,col){
+      var id=idx++;var taken=TAKEN.has(id);var cls=taken?'taken':isH?'haptic':'free';
+      return '<button class="seat '+cls+'" id="seat'+id+'" onclick="toggleSeat('+id+','+isH+')" '+(taken?'disabled':'')+'>'+row+(col+1)+'</button>'+(col===4?'<div class="seat-gap"></div>':'');
+    }).join('');
+    return '<div class="seat-row"><div class="row-label">'+row+'</div>'+seats+'</div>';
+  }).join('');
+  var ss=document.getElementById('seatSection');ss.style.display='block';
+  ['arPanel','summaryBar'].forEach(function(id){document.getElementById(id).style.display='none';});
+  ss.scrollIntoView({behavior:'smooth'});
+}
+function toggleSeat(id,isH){
+  if(selS.has(id)){selS.delete(id);document.getElementById('seat'+id).className='seat '+(isH?'haptic':'free');}
+  else{if(selS.size>=8){alert('Maximum 8 seats per booking.');return;}selS.add(id);document.getElementById('seat'+id).className='seat selected';}
+  updateSummary();
+}
+function updateSummary(){
+  var bar=document.getElementById('summaryBar');
+  if(!selS.size){bar.style.display='none';return;}
+  var ac=(selA?selA.price:0)*selS.size,total=selS.size*selM.price+ac;
+  document.getElementById('summaryInfo').innerHTML='<strong>'+selM.title+'</strong> &middot; '+selT+'<br>'+selS.size+' Seat'+(selS.size>1?'s':'')+(selA?' &middot; '+selA.name:'')+' &middot; Total: <strong>&#8377;'+total.toLocaleString('en-IN')+'</strong>';
+  bar.style.display='flex';
+}
+
+function confirmTickets(){
+  if(!selS.size){alert('Please select at least one seat.');return;}
+  var ac=(selA?selA.price:0)*selS.size,total=selS.size*selM.price+ac;
+  var city=document.getElementById('mCity').value||'Cinema';
+  var seatList=[...selS].map(function(id){
+    var rows=['A','B','C','D','E','F','G','H'];
+    return rows[Math.floor(id/10)]+(id%10+1);
+  }).join(', ');
+
+  // Save booking data and go to payment
+  var booking={
+    type:'movie',
+    title:selM.title,
+    detail:'\uD83C\uDFAC '+city+' \u00b7 '+selT+(selA&&selA.price>0?' \u00b7 '+selA.name:'')+' \u00b7 Seats: '+seatList,
+    movie:selM.title,
+    showtime:selT,
+    seats:seatList,
+    addon:selA?selA.name:'Standard',
+    price:'\u20B9'+total.toLocaleString('en-IN'),
+    priceNum:total
+  };
+  localStorage.setItem('travelgo_pending_payment',JSON.stringify(booking));
+  window.location.href='payment.html';
+}
+
+function openARModal(){
+  var seats=['Row C \u00b7 Seat 3','Row E \u00b7 Seat 7','Row F \u00b7 Seat 2','Row B \u00b7 Seat 9'];
+  document.getElementById('arModalSeat').textContent=seats[Math.floor(Math.random()*4)]+' \u2014 '+(Math.floor(Math.random()*20)+5)+'m ahead';
+  document.getElementById('arModal').classList.add('open');
+}
+function closeARModal(){document.getElementById('arModal').classList.remove('open');}
+</script>
+<script src="navbar.js"></script>
+<script src="animations.js"></script>
+</body>
+</html>

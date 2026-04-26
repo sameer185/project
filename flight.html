@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelGo | Flight Booking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="animations.css">
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="backgrounds.css">
+<script src="stateCity.js"></script>
+<style>
+/* ── FLIGHT-PAGE SPECIFIC ── */
+.price-lock-banner,.cab-banner{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  border-radius:var(--radius);padding:20px 24px;
+}
+.price-lock-banner{background:linear-gradient(135deg,#fef9c3,#fef3c7);border:1.5px solid #fcd34d;}
+.cab-banner{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;}
+.pl-icon,.cb-icon{font-size:36px;flex-shrink:0;}
+.pl-text h4,.cb-text h4{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:3px;}
+.pl-text h4{color:#92400e;} .pl-text p{font-size:13px;color:#a16207;line-height:1.5;}
+.cb-text h4{color:#166534;} .cb-text p{font-size:13px;color:#15803d;line-height:1.5;}
+.pl-btn{margin-left:auto;padding:9px 20px;background:var(--gold);color:#fff;border:none;
+  border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.pl-btn:hover{background:#b45309;}
+
+.toggle-switch{position:relative;width:48px;height:26px;margin-left:auto;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#d1d5db;border-radius:100px;cursor:pointer;transition:0.3s;}
+.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:0.3s;box-shadow:0 2px 4px rgba(0,0,0,0.15);}
+.toggle-switch input:checked+.toggle-slider{background:var(--green);}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(22px);}
+
+.cab-panel{background:#f0fdf4;border:1.5px solid #86efac;border-radius:var(--radius-sm);
+  padding:18px 20px;margin-top:14px;display:none;}
+.cab-panel h5{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#166534;margin-bottom:12px;}
+.cab-form{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.cab-form input,.cab-form select{padding:10px 13px;background:#fff;border:1.5px solid #86efac;
+  border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--text);}
+.cab-confirm{padding:10px 18px;background:var(--green);color:#fff;border:none;
+  border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+
+.flight-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:24px 28px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.04);transition:all 0.28s;}
+.flight-card:hover{border-color:var(--accent);box-shadow:0 10px 36px rgba(29,78,216,0.1);transform:translateY(-2px);}
+.flight-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.flight-airline{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;}
+.flight-route{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;
+  display:flex;align-items:center;gap:14px;color:var(--text);}
+.flight-route .sep{font-size:14px;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;}
+.flight-duration{font-size:13px;color:var(--muted);margin-top:4px;}
+.badge-nonstop{background:#dcfce7;color:var(--green);font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:100px;display:inline-block;margin-left:8px;}
+.ai-chip{display:inline-flex;align-items:center;gap:5px;background:var(--accent-light);
+  border:1px solid rgba(29,78,216,0.2);color:var(--accent);font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:100px;margin-top:6px;}
+.flight-right{text-align:right;}
+.flight-price{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--accent);}
+.flight-per{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.flight-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.btn-book{padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;
+  box-shadow:0 4px 14px var(--accent-glow);}
+.btn-lock{padding:9px 16px;background:#fef9c3;color:#92400e;border:1.5px solid #fcd34d;
+  border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.btn-lock:hover{background:#fef3c7;}
+
+.modal-price{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;color:var(--accent);margin-bottom:4px;}
+.modal-detail{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.modal-features{background:var(--bg);border-radius:var(--radius-sm);padding:16px;margin-bottom:22px;list-style:none;}
+.modal-features li{font-size:13.5px;color:var(--text2);margin-bottom:8px;}
+.modal-confirm{flex:1;padding:13px;background:var(--gold);color:#fff;border:none;border-radius:var(--radius-sm);
+  font-family:'Playfair Display',serif;font-weight:700;font-size:15px;cursor:pointer;}
+
+.cab-img-section{padding:0 5% 60px;display:none;}
+.cab-img-section h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:800;margin-bottom:6px;}
+.cab-img-section p{color:var(--muted);font-size:14px;margin-bottom:22px;}
+.cab-img-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;}
+.cab-img-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 2px 12px rgba(0,0,0,0.05);transition:all 0.3s;}
+.cab-img-card:hover{transform:translateY(-5px);box-shadow:var(--shadow);}
+.cab-img-card img{width:100%;height:170px;object-fit:cover;}
+.cic-body{padding:18px;}
+.cic-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:4px;}
+.cic-sub{font-size:12px;color:var(--muted);}
+.cic-ai{background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:100px;margin-top:8px;display:inline-block;}
+</style>
+</head>
+<body class="page-flight">
+
+<nav class="navbar">
+  <a href="index.html" class="logo">TravelGo</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="flight.html" class="active">Flights</a>
+    <a href="train.html">Trains</a>
+    <a href="hotel.html">Hotels</a>
+    <a href="movie.html">Movies</a>
+    <a href="mybookings.html">My Bookings</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="nav-cta">Sign Up</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="breadcrumb"><a href="index.html">Home</a> → Flights</div>
+  <h1>✈️ Book Flight Tickets</h1>
+  <p>Compare the best fares with next-gen 2026 features built right in.</p>
+  <div class="feature-badges">
+    <div class="fbadge new">🔒 Price Lock Guarantee</div>
+    <div class="fbadge new">🚖 AI Auto-Rescheduling Cabs</div>
+    <div class="fbadge">⚡ Instant Confirmation</div>
+    <div class="fbadge">🤖 AI Delay Detection</div>
+  </div>
+</div>
+
+<div style="padding:28px 5% 0;display:flex;flex-direction:column;gap:14px;">
+  <div class="price-lock-banner">
+    <div class="pl-icon">🔒</div>
+    <div class="pl-text"><h4>Price Lock Guarantee — NEW in 2026</h4><p>Freeze any fare for just ₹200 for up to 48 hours. Price goes up? Pay the locked fare. Price drops? You pay less.</p></div>
+    <button class="pl-btn" onclick="showPriceLockInfo()">Learn More</button>
+  </div>
+  <div class="cab-banner">
+    <div class="cb-icon">🚖</div>
+    <div class="cb-text"><h4>AI Auto-Rescheduling Cabs</h4><p>Link your airport cab to your flight. If your flight is delayed, our AI automatically reschedules your pickup — no calls needed.</p></div>
+    <label class="toggle-switch"><input type="checkbox" id="autoCabToggle" onchange="toggleAutoCab(this)"><span class="toggle-slider"></span></label>
+  </div>
+</div>
+
+<div class="booking-section" style="padding-top:28px;">
+  <div class="form-card">
+    <div class="tab-group">
+      <button class="tab-btn active" onclick="setTab(this,'one-way')">One Way</button>
+      <button class="tab-btn" onclick="setTab(this,'round-trip')">Round Trip</button>
+      <button class="tab-btn" onclick="setTab(this,'multi-city')">Multi City</button>
+    </div>
+
+    <div class="form-row" style="grid-template-columns:1fr 48px 1fr;align-items:start;">
+      <div class="state-city-group">
+        <div class="field"><label>From State</label><select id="fromState"></select></div>
+        <div class="field"><label>From City</label><select id="fromCity" disabled></select></div>
+      </div>
+      <div class="swap-col" style="padding-top:28px;"><button class="swap-btn" onclick="swapCities()" title="Swap">⇄</button></div>
+      <div class="state-city-group">
+        <div class="field"><label>To State</label><select id="toState"></select></div>
+        <div class="field"><label>To City</label><select id="toCity" disabled></select></div>
+      </div>
+    </div>
+
+    <div class="form-row four">
+      <div class="field"><label>Departure</label><input type="date" id="depDate"></div>
+      <div class="field" id="returnField" style="display:none;"><label>Return</label><input type="date"></div>
+      <div class="field"><label>Passengers</label><select><option>1 Adult</option><option>2 Adults</option><option>3 Adults</option><option>4 Adults</option></select></div>
+      <div class="field"><label>Cabin Class</label><select><option>Economy</option><option>Premium Economy</option><option>Business</option><option>First Class</option></select></div>
+    </div>
+
+    <div class="cab-panel" id="cabPanel">
+      <h5>🚖 Link Your AI Auto-Rescheduling Cab</h5>
+      <div class="cab-form">
+        <input type="text" placeholder="Pickup address / Hotel name" style="flex:2;min-width:160px;">
+        <input type="time" id="cabTime" style="flex:1;min-width:100px;">
+        <select style="flex:1;min-width:120px;"><option>Sedan</option><option>SUV</option><option>Mini</option><option>Prime</option></select>
+        <button class="cab-confirm" onclick="linkCab()">Link Cab ✓</button>
+      </div>
+    </div>
+    <button class="search-btn" onclick="searchFlights()">Search Flights →</button>
+  </div>
+</div>
+
+<div class="results-section" id="resultsSection">
+  <div class="results-title" id="resultsTitle">Available Flights</div>
+  <div id="flightCards"></div>
+</div>
+
+<div class="cab-img-section" id="cabImgSection">
+  <h2>🚖 AI-Linked Airport Cabs</h2>
+  <p>Your cab watches your flight and adjusts automatically — zero effort required.</p>
+  <div class="cab-img-grid">
+    <div class="cab-img-card card"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=80" alt="cab" onerror="this.style.display='none'"><div class="cic-body"><div class="cic-title">Premium Airport Pickup</div><div class="cic-sub">AC Sedan · Door to terminal</div><div class="cic-ai">🤖 AI-monitored flight</div></div></div>
+    <div class="cab-img-card card"><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&q=80" alt="cab" onerror="this.style.display='none'"><div class="cic-body"><div class="cic-title">Auto-Rescheduling SUV</div><div class="cic-sub">If flight delayed → pickup auto-shifts</div><div class="cic-ai">🤖 Zero action needed</div></div></div>
+    <div class="cab-img-card card"><img src="https://images.unsplash.com/photo-1590508279628-3a5b40cabb39?w=600&q=80" alt="cab" onerror="this.style.display='none'"><div class="cic-body"><div class="cic-title">Executive Class</div><div class="cic-sub">Live tracking · Cold water included</div><div class="cic-ai">🤖 Delay-aware scheduling</div></div></div>
+  </div>
+</div>
+
+<!-- PRICE LOCK MODAL -->
+<div class="modal-overlay" id="priceLockModal">
+  <div class="modal">
+    <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+    <h3 id="plModalTitle">Lock This Fare</h3>
+    <p>Pay just ₹200 to freeze this price for 48 hours. You always get the best deal.</p>
+    <div class="modal-price" id="plModalPrice">₹3,499</div>
+    <div class="modal-detail" id="plModalDetail"></div>
+    <ul class="modal-features">
+      <li>✅ Price goes up → You pay the locked fare</li>
+      <li>✅ Price drops → You pay the lower price</li>
+      <li>✅ 48-hour freeze window</li>
+      <li>✅ Full refund if you don't book</li>
+    </ul>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closePriceLock()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmPriceLock()">🔒 Lock for ₹200</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('depDate').min = new Date().toISOString().split('T')[0];
+document.getElementById('depDate').value = new Date().toISOString().split('T')[0];
+let currentLockFlight = null;
+
+wireStateCity('fromState','fromCity','Select City');
+wireStateCity('toState','toCity','Select City');
+
+function setTab(el, tab) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('returnField').style.display = tab==='round-trip'?'flex':'none';
+}
+
+function swapCities() {
+  const fs=document.getElementById('fromState'),ts=document.getElementById('toState');
+  [fs.value,ts.value]=[ts.value,fs.value];
+  populateCities('fromState','fromCity'); populateCities('toState','toCity');
+}
+
+function toggleAutoCab(cb) {
+  document.getElementById('cabPanel').style.display = cb.checked?'block':'none';
+  if(cb.checked) alert('🚖 AI Cab Monitoring ON!\n\nOur AI will watch your flight and auto-reschedule your cab if there\'s any delay!');
+}
+function linkCab() {
+  const t=document.getElementById('cabTime').value;
+  if(!t){alert('Please set your cab pickup time!');return;}
+  alert(`✅ Cab Linked!\nPickup time: ${t}\nAI will auto-adjust if your flight is delayed.`);
+}
+function showPriceLockInfo() {
+  alert('🔒 Price Lock Guarantee\n\nPay ₹200 to freeze any fare for 48 hours.\n• Price goes UP → Pay the locked price\n• Price goes DOWN → Pay the lower price\n• No booking within 48hrs → Full ₹200 refund');
+}
+
+const FLIGHT_ROUTES = {
+  default:[
+    {airline:'IndiGo',dep:'06:00',arr:'08:05',stops:'Non-stop',duration:'2h 05m',price:'₹3,499',num:3499,class:'Economy',logo:'6E'},
+    {airline:'Air India',dep:'09:30',arr:'11:50',stops:'Non-stop',duration:'2h 20m',price:'₹4,199',num:4199,class:'Economy',logo:'AI'},
+    {airline:'SpiceJet',dep:'13:15',arr:'15:30',stops:'Non-stop',duration:'2h 15m',price:'₹2,999',num:2999,class:'Economy',logo:'SG'},
+    {airline:'Vistara',dep:'17:45',arr:'20:00',stops:'Non-stop',duration:'2h 15m',price:'₹5,299',num:5299,class:'Business',logo:'UK'},
+    {airline:'Akasa Air',dep:'21:00',arr:'23:20',stops:'Non-stop',duration:'2h 20m',price:'₹2,699',num:2699,class:'Economy',logo:'QP'},
+    {airline:'Air India Exp',dep:'05:30',arr:'07:40',stops:'Non-stop',duration:'2h 10m',price:'₹3,199',num:3199,class:'Economy',logo:'IX'},
+    {airline:'IndiGo',dep:'11:00',arr:'13:10',stops:'1 Stop',duration:'3h 10m',price:'₹2,499',num:2499,class:'Economy',logo:'6E'},
+    {airline:'Air India',dep:'15:30',arr:'18:00',stops:'Non-stop',duration:'2h 30m',price:'₹6,799',num:6799,class:'Business',logo:'AI'},
+  ],
+  'Chennai-Mumbai':[
+    {airline:'IndiGo',dep:'05:45',arr:'07:55',stops:'Non-stop',duration:'2h 10m',price:'₹3,299',num:3299,class:'Economy',logo:'6E'},
+    {airline:'Air India',dep:'08:30',arr:'10:50',stops:'Non-stop',duration:'2h 20m',price:'₹4,499',num:4499,class:'Economy',logo:'AI'},
+    {airline:'SpiceJet',dep:'12:10',arr:'14:25',stops:'Non-stop',duration:'2h 15m',price:'₹2,799',num:2799,class:'Economy',logo:'SG'},
+    {airline:'Vistara',dep:'16:00',arr:'18:10',stops:'Non-stop',duration:'2h 10m',price:'₹5,699',num:5699,class:'Business',logo:'UK'},
+    {airline:'Akasa Air',dep:'19:45',arr:'22:00',stops:'Non-stop',duration:'2h 15m',price:'₹2,599',num:2599,class:'Economy',logo:'QP'},
+    {airline:'Air India Exp',dep:'22:30',arr:'00:40',stops:'Non-stop',duration:'2h 10m',price:'₹3,099',num:3099,class:'Economy',logo:'IX'},
+  ],
+  'Chennai-Delhi':[
+    {airline:'Air India',dep:'06:00',arr:'09:10',stops:'Non-stop',duration:'3h 10m',price:'₹5,499',num:5499,class:'Economy',logo:'AI'},
+    {airline:'IndiGo',dep:'07:30',arr:'10:40',stops:'Non-stop',duration:'3h 10m',price:'₹4,199',num:4199,class:'Economy',logo:'6E'},
+    {airline:'Vistara',dep:'09:00',arr:'12:20',stops:'Non-stop',duration:'3h 20m',price:'₹7,299',num:7299,class:'Business',logo:'UK'},
+    {airline:'SpiceJet',dep:'14:00',arr:'17:15',stops:'Non-stop',duration:'3h 15m',price:'₹3,799',num:3799,class:'Economy',logo:'SG'},
+    {airline:'Akasa Air',dep:'18:30',arr:'21:45',stops:'Non-stop',duration:'3h 15m',price:'₹3,499',num:3499,class:'Economy',logo:'QP'},
+    {airline:'Air India',dep:'22:00',arr:'01:20',stops:'Non-stop',duration:'3h 20m',price:'₹8,999',num:8999,class:'Business',logo:'AI'},
+  ],
+  'Mumbai-Bangalore':[
+    {airline:'IndiGo',dep:'06:15',arr:'07:35',stops:'Non-stop',duration:'1h 20m',price:'₹2,899',num:2899,class:'Economy',logo:'6E'},
+    {airline:'Air India',dep:'09:00',arr:'10:20',stops:'Non-stop',duration:'1h 20m',price:'₹3,799',num:3799,class:'Economy',logo:'AI'},
+    {airline:'Vistara',dep:'11:30',arr:'12:55',stops:'Non-stop',duration:'1h 25m',price:'₹5,199',num:5199,class:'Business',logo:'UK'},
+    {airline:'SpiceJet',dep:'14:45',arr:'16:05',stops:'Non-stop',duration:'1h 20m',price:'₹2,399',num:2399,class:'Economy',logo:'SG'},
+    {airline:'Akasa Air',dep:'18:00',arr:'19:20',stops:'Non-stop',duration:'1h 20m',price:'₹2,199',num:2199,class:'Economy',logo:'QP'},
+  ],
+  'Delhi-Kolkata':[
+    {airline:'Air India',dep:'07:00',arr:'09:15',stops:'Non-stop',duration:'2h 15m',price:'₹4,299',num:4299,class:'Economy',logo:'AI'},
+    {airline:'IndiGo',dep:'09:30',arr:'11:45',stops:'Non-stop',duration:'2h 15m',price:'₹3,299',num:3299,class:'Economy',logo:'6E'},
+    {airline:'Vistara',dep:'12:00',arr:'14:15',stops:'Non-stop',duration:'2h 15m',price:'₹6,299',num:6299,class:'Business',logo:'UK'},
+    {airline:'SpiceJet',dep:'15:30',arr:'17:50',stops:'Non-stop',duration:'2h 20m',price:'₹2,799',num:2799,class:'Economy',logo:'SG'},
+    {airline:'Akasa Air',dep:'19:00',arr:'21:20',stops:'Non-stop',duration:'2h 20m',price:'₹2,599',num:2599,class:'Economy',logo:'QP'},
+  ],
+  'Hyderabad-Goa':[
+    {airline:'IndiGo',dep:'08:00',arr:'09:30',stops:'Non-stop',duration:'1h 30m',price:'₹3,199',num:3199,class:'Economy',logo:'6E'},
+    {airline:'Air India',dep:'11:15',arr:'12:45',stops:'Non-stop',duration:'1h 30m',price:'₹4,099',num:4099,class:'Economy',logo:'AI'},
+    {airline:'SpiceJet',dep:'15:00',arr:'16:30',stops:'Non-stop',duration:'1h 30m',price:'₹2,799',num:2799,class:'Economy',logo:'SG'},
+    {airline:'Vistara',dep:'18:30',arr:'20:00',stops:'Non-stop',duration:'1h 30m',price:'₹5,499',num:5499,class:'Business',logo:'UK'},
+  ],
+};
+
+function getFlights(from, to) {
+  const key1=`${from}-${to}`, key2=`${to}-${from}`;
+  if(FLIGHT_ROUTES[key1]) return FLIGHT_ROUTES[key1];
+  if(FLIGHT_ROUTES[key2]) return FLIGHT_ROUTES[key2];
+  for(const k of Object.keys(FLIGHT_ROUTES)){
+    if(k==='default') continue;
+    const [a,b]=k.split('-');
+    if((from.includes(a)||a.includes(from))&&(to.includes(b)||b.includes(to))) return FLIGHT_ROUTES[k];
+    if((to.includes(a)||a.includes(to))&&(from.includes(b)||b.includes(from))) return FLIGHT_ROUTES[k];
+  }
+  return FLIGHT_ROUTES.default;
+}
+
+function searchFlights() {
+  const from=document.getElementById('fromCity').value;
+  const to=document.getElementById('toCity').value;
+  const date=document.getElementById('depDate').value;
+  if(!from||!to){alert('Please select departure and destination cities.');return;}
+  if(!date){alert('Please select a departure date.');return;}
+  const sec=document.getElementById('resultsSection');
+  const fmt=new Date(date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  document.getElementById('resultsTitle').textContent=`${from} → ${to} · ${fmt}`;
+  document.getElementById('flightCards').innerHTML=getFlights(from,to).map(f=>`
+    <div class="flight-card">
+      <div class="flight-top">
+        <div>
+          <div class="flight-airline"><span style="background:var(--accent);color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:800;">${f.logo}</span>${f.airline}&nbsp;<span style="background:#f0fdf4;color:#16a34a;font-size:10px;padding:2px 8px;border-radius:100px;font-weight:700;">${f.class}</span></div>
+          <div class="flight-route">${f.dep}<span class="sep">──✈──</span>${f.arr}</div>
+          <div class="flight-duration">${f.duration}&nbsp;·&nbsp;<span class="badge-nonstop">${f.stops}</span></div>
+          <div class="ai-chip">🤖 AI Delay Monitor Active</div>
+        </div>
+        <div class="flight-right">
+          <div class="flight-price">${f.price}</div>
+          <div class="flight-per">per person</div>
+          <div class="flight-actions">
+            <button class="btn-lock" onclick="openPriceLock('${f.airline}','${from}→${to}','${f.price}')">🔒 Lock ₹200</button>
+            <button class="btn-book" onclick="confirmBook('${f.airline}','${from}→${to}','${f.price}','${f.dep}','${f.arr}','${f.duration}')">Book Now →</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+  sec.style.display='block';
+  document.getElementById('cabImgSection').style.display='block';
+  sec.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function openPriceLock(airline,route,price){
+  currentLockFlight={airline,route,price};
+  document.getElementById('plModalTitle').textContent=`Lock This Fare — ${airline}`;
+  document.getElementById('plModalPrice').textContent=price;
+  document.getElementById('plModalDetail').textContent=`${airline} · ${route} · Economy`;
+  document.getElementById('priceLockModal').classList.add('open');
+}
+function closePriceLock(){document.getElementById('priceLockModal').classList.remove('open');}
+function confirmPriceLock(){
+  closePriceLock();
+  const expiry=new Date(Date.now()+48*3600000).toLocaleString('en-IN');
+  alert(`🔒 Fare Locked!\n\n${currentLockFlight.price} locked for 48 hours.\nExpires: ${expiry}\n₹200 charged.`);
+}
+
+function confirmBook(airline,route,price,dep,arr,duration){
+  const booking={
+    type:'flight',
+    title:`${airline} · ${route}`,
+    detail:`Economy · Dep: ${dep}  Arr: ${arr} · ${duration}`,
+    airline, route, departure:dep, arrival:arr, duration, price,
+    priceNum:parseInt(price.replace(/[^0-9]/g,''))||0
+  };
+  localStorage.setItem('travelgo_pending_payment', JSON.stringify(booking));
+  window.location.href='payment.html';
+}
+</script>
+<script src="navbar.js"></script>
+<script src="animations.js"></script>
+</body>
+</html>

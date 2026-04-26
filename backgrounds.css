@@ -1,0 +1,227 @@
+/* ================================================================
+   TravelGo — BACKGROUND IMAGES 2026
+   High-quality Unsplash travel photos for every page
+   All images: free, no attribution required
+================================================================ */
+
+/* ── HERO — Index homepage ── */
+.hero {
+  background-image:
+    linear-gradient(135deg, rgba(10,20,60,0.55) 0%, rgba(0,50,80,0.35) 60%, transparent 100%),
+    url('https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1920&q=85&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center 40%;
+  background-attachment: fixed;
+}
+/* Override the plain gradient ::before on hero */
+.hero::before {
+  background: linear-gradient(135deg, rgba(10,20,60,0.45) 0%, rgba(0,0,0,0.1) 100%) !important;
+}
+.hero::after {
+  opacity: 0.15 !important;
+}
+/* Make hero text pop against the dark image */
+.hero h1 { color: #fff !important; }
+.hero h1 em { -webkit-text-fill-color: transparent; }
+.hero-sub { color: rgba(255,255,255,0.82) !important; }
+.hero-badge { background: rgba(255,255,255,0.15) !important; border-color: rgba(255,255,255,0.3) !important; color: #fff !important; }
+.hero-badge .dot { background: #fff !important; }
+.btn-outline { border-color: rgba(255,255,255,0.5) !important; color: #fff !important; background: rgba(255,255,255,0.1) !important; }
+.btn-outline:hover { background: rgba(255,255,255,0.2) !important; }
+.hero-trust { color: rgba(255,255,255,0.7) !important; }
+.trust-num { color: #fff !important; }
+.trust-divider { background: rgba(255,255,255,0.3) !important; }
+
+/* ── STAT CARDS on hero visual ── */
+.stat-card {
+  background: rgba(255,255,255,0.92) !important;
+  backdrop-filter: blur(24px) !important;
+}
+
+/* ── PAGE HERO (all inner pages) ── */
+.page-hero {
+  position: relative;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+}
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(10,20,60,0.72) 0%, rgba(0,40,80,0.5) 60%, rgba(0,0,0,0.3) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+.page-hero > * { position: relative; z-index: 1; }
+
+/* Make page-hero text white on all inner pages */
+.page-hero h1,
+.page-hero .breadcrumb,
+.page-hero .breadcrumb a,
+.page-hero p {
+  color: #fff !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.page-hero .breadcrumb a { opacity: 0.75; }
+.page-hero .breadcrumb a:hover { opacity: 1; }
+.page-hero .fbadge {
+  background: rgba(255,255,255,0.15) !important;
+  border-color: rgba(255,255,255,0.3) !important;
+  color: #fff !important;
+  backdrop-filter: blur(8px);
+}
+.page-hero .fbadge.new {
+  background: rgba(29,78,216,0.4) !important;
+  border-color: rgba(255,255,255,0.4) !important;
+}
+
+/* ── FLIGHTS PAGE ── */
+body.page-flight .page-hero {
+  background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&q=85&auto=format&fit=crop') !important;
+}
+
+/* ── TRAINS PAGE ── */
+body.page-train .page-hero {
+  background-image: url('https://images.unsplash.com/photo-1474487548417-781cb6d646b3?w=1920&q=85&auto=format&fit=crop') !important;
+}
+
+/* ── HOTELS PAGE ── */
+body.page-hotel .page-hero {
+  background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=85&auto=format&fit=crop') !important;
+}
+
+/* ── MOVIES PAGE ── */
+body.page-movie .page-hero {
+  background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1920&q=85&auto=format&fit=crop') !important;
+}
+
+/* ── MY BOOKINGS PAGE ── */
+body.page-bookings .page-hero {
+  background-image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920&q=85&auto=format&fit=crop') !important;
+}
+
+/* ── PAYMENT PAGE ── */
+body.page-payment .page-hero {
+  background-image: url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&q=85&auto=format&fit=crop') !important;
+}
+
+/* ── AUTH PAGES (login / signup) ── */
+body.page-auth {
+  background-image:
+    linear-gradient(135deg, rgba(10,20,60,0.6) 0%, rgba(0,40,80,0.4) 100%),
+    url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=85&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+body.page-auth nav {
+  background: rgba(10,20,60,0.55) !important;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+body.page-auth nav .logo { color: #fff !important; -webkit-text-fill-color: #fff !important; }
+body.page-auth .nav-links a { color: rgba(255,255,255,0.8) !important; }
+body.page-auth .nav-links a:hover { color: #fff !important; }
+
+/* ── SERVICES SECTION — subtle travel collage overlay ── */
+.services-section {
+  position: relative;
+}
+.services-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 60% at 95% 50%, rgba(29,78,216,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 40% at 5% 50%, rgba(8,145,178,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── BOOK CARDS — image overlays ── */
+.book-card[data-type="flight"] {
+  background-image: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.97) 55%),
+    url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=80&auto=format&fit=crop');
+  background-size: cover, cover;
+  background-position: center, center top;
+}
+.book-card[data-type="train"] {
+  background-image: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.97) 55%),
+    url('https://images.unsplash.com/photo-1474487548417-781cb6d646b3?w=600&q=80&auto=format&fit=crop');
+  background-size: cover, cover;
+  background-position: center, center;
+}
+.book-card[data-type="hotel"] {
+  background-image: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.97) 55%),
+    url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80&auto=format&fit=crop');
+  background-size: cover, cover;
+  background-position: center, center;
+}
+.book-card[data-type="movie"] {
+  background-image: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.97) 55%),
+    url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80&auto=format&fit=crop');
+  background-size: cover, cover;
+  background-position: center, center;
+}
+.book-card { min-height: 200px; }
+.book-card .card-content { position: relative; z-index: 1; }
+
+/* ── FEATURES SECTION background strip ── */
+.features-section {
+  background-image:
+    linear-gradient(180deg, var(--bg) 0%, rgba(246,247,251,0.96) 100%),
+    url('https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1920&q=60&auto=format&fit=crop');
+  background-size: auto, cover;
+  background-position: center, center;
+  background-blend-mode: normal, luminosity;
+}
+
+/* ── STATS BAND ── */
+.stats-band {
+  background-image:
+    linear-gradient(135deg, rgba(10,20,60,0.9) 0%, rgba(8,40,100,0.88) 100%),
+    url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920&q=75&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* ── CONTACT SECTION ── */
+.contact-section {
+  background-image:
+    linear-gradient(135deg, rgba(246,247,251,0.97) 0%, rgba(239,246,255,0.95) 100%),
+    url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&q=65&auto=format&fit=crop');
+  background-size: auto, cover;
+  background-position: center, center bottom;
+}
+
+/* ── FORM CARD — subtle glass look on image backgrounds ── */
+.form-card {
+  background: rgba(255,255,255,0.97) !important;
+  backdrop-filter: blur(20px);
+}
+
+/* ── BOOKING SECTION background ── */
+.booking-section {
+  position: relative;
+}
+.booking-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(246,247,251,0.5) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.booking-section > * { position: relative; z-index: 1; }
+
+/* ── PARALLAX HELPER — smooth scroll attachment fallback ── */
+@media (max-width: 768px) {
+  .hero,
+  .page-hero,
+  .stats-band {
+    background-attachment: scroll !important;
+  }
+}
